@@ -88,6 +88,11 @@ i:hover {
     cursor: url(https://cdn.jsdelivr.net/gh/Eurkon/CDN@master/hexo/images/user/pointer.cur), auto;
 }
 
+/* 导航a标签 */
+.menus_item a:hover, .menus_item span:hover {
+    text-decoration: none;
+    cursor: url(https://cdn.jsdelivr.net/gh/Eurkon/CDN@master/hexo/images/user/pointer.cur), auto !important;
+}
 
 /*分页器*/
 
@@ -173,4 +178,80 @@ i:hover {
     box-shadow: 2px 2px 5px transparent;
     background: rgba(255, 255, 255, 0.0);
     padding: 0px;
+}
+
+/* ***************************************************** */
+
+/* 自定义字体 */
+@font-face {
+    font-display: swap;
+    font-family: 'sleek';
+    src: url('https://cdn.jsdelivr.net/gh/yutozh/CDN/standalone/font/sleek.woff2');
+}
+
+/* 页脚透明 */
+
+#footer {
+    background: transparent !important;
+}
+/*页脚a标签字体颜色*/
+#footer-wrap a {
+    color: #00c4b6;
+}
+
+/* a标签默认颜色 */
+
+#article-container a {
+    color: #00c4b6;
+    text-decoration: none;
+}
+
+/* 鼠标悬停时的颜色 */
+
+#article-container a:hover {
+    color: #e58a8a;
+    text-decoration: none;
+}
+/*a标签颜色*/
+a {
+    color: #00c4b6;
+}
+
+
+/* 顶部导航栏 */
+#nav a {
+    color: #f9f2f4;
+}
+
+
+.color-green {
+    color: #86e2a6;
+}
+
+.color-blue {
+    color: #B5DEFF;
+}
+
+.color-red {
+    color: red;
+}
+
+.color-grey {
+    color: rgb(172, 172, 172);
+}
+
+.color-purple {
+    color: #CAB8FF;
+}
+
+.color-pink {
+    color: rgba(250, 154, 226, 0.822);
+}
+
+.color-yellow {
+    color: #FCFFA6;
+}
+
+.color-orange {
+    color: #fdad62;
 }
