@@ -1,0 +1,399 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Geomesa-索引 | 於桃君的小仓库</title><meta name="keywords" content="Geomesa,学习笔记,大数据"><meta name="author" content="Yuto Zh"><meta name="copyright" content="Yuto Zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在之前的文章中，已经对Geomesa的基本功能和基本查询与写入操作做了介绍。我们了解到Geomesa是一个分布式地理大数据存储框架，它通过与许多分布式数据库整合，并提供标准化的接口，使得用户能方便、高效地在这些分布式数据库中查询、检索、处理时空大数据。在使用时，我们只需调用Geomesa提供的接口，而无需关心数据在底层数据库中的存储方式。但是，理解Geomesa数据存储方式，特别是其建立索引的方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Geomesa-索引">
+<meta property="og:url" content="https://zyt4321.github.io/post/5066df4.html">
+<meta property="og:site_name" content="於桃君的小仓库">
+<meta property="og:description" content="在之前的文章中，已经对Geomesa的基本功能和基本查询与写入操作做了介绍。我们了解到Geomesa是一个分布式地理大数据存储框架，它通过与许多分布式数据库整合，并提供标准化的接口，使得用户能方便、高效地在这些分布式数据库中查询、检索、处理时空大数据。在使用时，我们只需调用Geomesa提供的接口，而无需关心数据在底层数据库中的存储方式。但是，理解Geomesa数据存储方式，特别是其建立索引的方式">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.80/img_809_480x360_100_null_normal.jpg">
+<meta property="article:published_time" content="2020-01-12T14:31:52.000Z">
+<meta property="article:modified_time" content="2021-12-01T13:38:08.596Z">
+<meta property="article:author" content="Yuto Zh">
+<meta property="article:tag" content="Geomesa">
+<meta property="article:tag" content="大数据">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.80/img_809_480x360_100_null_normal.jpg"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://zyt4321.github.io/post/5066df4"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.js" defer></script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?526cd666012561974990381acfd5535e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"PG8YF6H1J2","apiKey":"ce412ecd71d1ba81bbd6d11fb1685148","indexName":"butterfly-blog","hits":{"per_page":"6s"},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Yuto Zh","link":"链接: ","source":"来源: 於桃君的小仓库","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Geomesa-索引',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-12-01 21:38:08'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    document.addEventListener('pjax:complete', detectApple)})(window)</script><link rel="stylesheet" href="/css/beauty.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yutozh/CDN@2.0/fontawesome-pro-master/css/all.min.css"><meta name="generator" content="Hexo 5.4.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">於桃君的小仓库</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Geomesa-索引</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-01-12T14:31:52.000Z" title="发表于 2020-01-12 22:31:52">2020-01-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-01T13:38:08.596Z" title="更新于 2021-12-01 21:38:08">2021-12-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>16分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Geomesa-索引"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>在之前的文章中，已经对Geomesa的基本功能和基本查询与写入操作做了介绍。我们了解到Geomesa是一个分布式地理大数据存储框架，它通过与许多分布式数据库整合，并提供标准化的接口，使得用户能方便、高效地在这些分布式数据库中查询、检索、处理时空大数据。在使用时，我们只需调用Geomesa提供的接口，而无需关心数据在底层数据库中的存储方式。但是，理解Geomesa数据存储方式，特别是其建立索引的方式，对我们更好的设计数据表结构，从而获得更高效的性能是很有帮助的。</p>
+<h2 id="Geomesa索引类别">Geomesa索引类别</h2>
+<p>GeoMesa提供多种索引以满足不同类型数据的检索需要：</p>
+<p><img src="https://file.oattao.cn/202112012013095.png" alt="image.png"></p>
+<h3 id="Z2与Z3索引">Z2与Z3索引</h3>
+<p>Z2与Z3索引分别使用二维和三维的Z曲线进行时空索引。Z曲线是一种空间填充曲线，可以将高维的空间用一维的折线表示。下图展示了二维和三维Z曲线的示意图：<br>
+<img src="https://file.oattao.cn/202112012013029.png" alt="image.png"><br>
+<strong>Geohash</strong>是Z曲线的一种实现，它的原理简单来说就是将经纬度划分并用二进制表示，经度和纬度的二进制交错合并，形成每一个区块的编号，将这些区块的中心按编号从小到大连接起来，就形成了Z曲线，而这些编号，就是各个区块的Geohash编码。<br>
+<img src="https://file.oattao.cn/202112012013820.png" alt="image.png"><br>
+三维的Z曲线也类似，只不过Geomesa将第三维用来存储时间，将连续的时间也按处理经纬度那样进行划分，和经纬度一起编码、存储，这样，当使用时间+空间的条件查询时，就能利用三维Z曲线的编码，加快查询速度。</p>
+<h3 id="XZ2和XZ3索引">XZ2和XZ3索引</h3>
+<p>对于点（Point）类型空间数据的存储，使用Z曲线能够实现高效的索引。但是对于复杂的空间数据（要素），如折线（Line）、多边形（Polygon）等，它们由若干个点通过不同的连接方式构成，如果要对其建立索引，最原始的方法就是对组成他们的各个点使用Geohash构建索引，但这样做会造成大量的冗余，而且在检索时需要比较每个点的位置，造成不必要的开销；另一种<strong>One-value</strong>方法，该方法首先计算要素的最小包围盒，再以能够包含该最小包围盒的最细粒度的Geohash格网编码作为该要素的索引，这样每个要素就有唯一的索引值了，但这种方法的缺点也很明显，当要素跨越了Geohash格网划分线时，就需要使用上一级的Geohash格网编码，造成编码长度过短，索引效果不好的情况，极端情况下，还会出现编码为空的可能（即要素只能被第0级Geohash格网完全包含）；针对以上方法的缺点，有人提出了一种<strong>Extended Z-ordering</strong>的方法，该方法解决了One-value方法中，某些图形编码长度短，甚至编码为空的问题，提高表示精度，减小表示误差，同时还提出一种复杂的编码模式，将非定长的编码转化为定长编码，最后设计了一种对应于该编码的高效查询算法，具体细节请参考原始论文：</p>
+<blockquote>
+<p>Böhm, Klump, and Kriegel. <a target="_blank" rel="noopener" href="http://www.dbs.ifi.lmu.de/Publikationen/Boehm/Ordering_99.pdf">“XZ-ordering: a space-filling curve for objects with spatial extension”</a> 6th. Int. Symposium on Large Spatial Databases (SSD), 1999, Hong Kong, China.</p>
+</blockquote>
+<p>下图是这三种方法的示意图，可以看出XZ索引（Extended Z-ordering）表示的范围更加精细，且减少了存储冗余。<br>
+<img src="https://file.oattao.cn/202112012013395.png" alt="image.png"></p>
+<p>Geomesa就采用了XZ索引方法构建复杂要素的索引，与Z2和Z3类似，XZ2用于只含空间属性的数据，XZ3则用于同时包含时间和空间属性的数据。</p>
+<h3 id="ID-索引">ID 索引</h3>
+<p>Geomesa中存储的每条数据都对应一个ID，这个ID可由Geomesa自动生成，也可以是自定义的，类似于关系数据库中的主键。Geomesa会单独为ID构建一个索引，这意味着我们可以使用ID作为查询条件来快速的查询数据。</p>
+<h3 id="属性索引">属性索引</h3>
+<p>空间数据往往带有若干个属性字段，属性索引就是用来对这些属性字段建立索引的。</p>
+<h2 id="Geomesa定义表结构">Geomesa定义表结构</h2>
+<p>Geomesa使用SimpleFeatureType定义表结构，在SimpleFeatureType中指定了表中各个字段的列名、数据类型、是否建立索引等信息，还可以在SimpleFeatureType中设置字段级和表级的用户数据（user-data），以满足不同数据存储的需要。</p>
+<p>SimpleFeatureType的创建方式有两种，分别是使用字符串定义和使用配置文件（TypeSafe Configuration Files）定义，如， 使用字符串定义的SimpleFeatureType：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;name:String,dtg:Date,*geom:Point:srid=4326;option.one=&#x27;foo&#x27;,option.two=&#x27;bar&#x27;&quot;</span><br></pre></td></tr></table></figure>
+<p>在这个SimpleFeatureType中，定义了类型为String的name字段，类型为Date的dtg字段，以及类型为Point的geom字段，此外，对geom字段还设置了字段级的用户数据<code>srid=4326</code>，用于设置该字段属性。被分号分隔的<code>option.one='foo',option.two='bar'</code>是表级的用户数据，用于设置整个表的属性。</p>
+<p>上面的SimpleFeatureType也可以使用配置文件来定义：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">geomesa &#123;</span><br><span class="line">  sfts &#123;</span><br><span class="line">    &quot;mySft&quot; = &#123;</span><br><span class="line">      attributes = [</span><br><span class="line">        &#123; name = name, type = String             &#125;</span><br><span class="line">        &#123; name = dtg,  type = Date               &#125;</span><br><span class="line">        &#123; name = geom, type = Point, srid = 4326 &#125;</span><br><span class="line">      ]</span><br><span class="line">      user-data = &#123;</span><br><span class="line">        option.one = &quot;foo&quot;,</span><br><span class="line">        option.two = &quot;bar&quot;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除了以上两种完整创建SimpleFeatureType的方法外，Geomesa还提供了Java函数对已经存在的SimpleFeatureType做局部修改，其中，对字段级和表级用户数据的修改方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SimpleFeatureType sft = ...</span><br><span class="line">sft.getUserData().put(&quot;option.one&quot;, &quot;foo&quot;);  // 表级</span><br><span class="line">sft.getDescriptor(&quot;name&quot;).getUserData().put(&quot;index&quot;, &quot;true&quot;);  // 字段级</span><br></pre></td></tr></table></figure>
+<h2 id="Geomesa索引设置">Geomesa索引设置</h2>
+<p>对Geomesa表索引的设置，都是通过设置字段级和表级的用户数据来实现的。</p>
+<h3 id="默认索引">默认索引</h3>
+<p>首先来看Geomesa构建索引的默认方法。假设数据类型中包含3个字段，类型分别是日期、几何、普通属性，那么在未指定任何索引的情况下，Geomesa会建立Z2、Z3索引（或者XZ2、XZ3索引，根据几何字段的具体类别确定）以及ID索引。</p>
+<p>在此基础上，如果要对普通属性构建索引，则需要在SimpleFeatureType中对该属性添加<code>index=true</code>选项。</p>
+<p>如果数据中存在几何类型的字段，Geomesa会使用该字段构建Z2索引（XZ2索引）。如果数据中包含日期类型的字段，Geomesa将使用该字段与几何字段共同构建Z3索引（XZ3索引）。</p>
+<ul>
+<li>对于有多个几何字段的数据，Geomesa只会使用一个字段构建空间索引，默认是第一个几何字段，也可以用<code>default=true</code>选项指定。</li>
+<li>对于有多个日期字段的数据，Geomesa使用其中一个（默认是第一个）与几何字段构建时空索引（Z3/XZ3），其余日期字段若设置了<code>index=true</code>选项，则他们将被当做普通的属性，构建属性索引。</li>
+</ul>
+<p>需要注意的是，如果使用日期字段和几何字段共同构建时空索引之后，单独查询日期字段就无法使用该索引了（单独查询几何字段是可以使用索引的，因为同时建立了Z2/XZ2索引），会导致全表扫描，造成查询速度很慢。</p>
+<h3 id="多时空索引">多时空索引</h3>
+<p>如果存在多个几何和日期字段，可以手动指定他们的组合，建立多个时空索引，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String spec = &quot;name:String,dtg:Date,*start:Point:srid=4326,end:Point:srid=4326&quot;;</span><br><span class="line">SimpleFeatureType sft = SimpleFeatureTypes.createType(&quot;mySft&quot;, spec);</span><br><span class="line">// enable a default z3 index on start + dtg</span><br><span class="line">sft.getUserData().put(&quot;geomesa.indices.enabled&quot;, &quot;z3&quot;);</span><br><span class="line">// alternatively, enable a z3 index on start + dtg, end + dtg, and an attribute index on</span><br><span class="line">// name with a secondary index on dtg. note that this overrides the previous configuration</span><br><span class="line">sft.getUserData().put(&quot;geomesa.indices.enabled&quot;, &quot;z3:start:dtg,z3:end:dtg,attr:name:dtg&quot;);</span><br></pre></td></tr></table></figure>
+<h4 id="日期索引">日期索引</h4>
+<p>要修改默认的日期索引策略，可以手动设置。</p>
+<ul>
+<li>指定参与时空索引的日期字段：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sft1.getUserData().put(&quot;geomesa.index.dtg&quot;, &quot;myDate&quot;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>不将日期字段与几何字段共同索引：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sft2.getUserData().put(&quot;geomesa.ignore.dtg&quot;, true);</span><br></pre></td></tr></table></figure>
+<p>使用Z3/XZ3索引的日期，默认会按星期被切分为多个块，与空间数据一同构建Z3/XZ3索引。Geomesa提供了四种不同的切分粒度，分别是：<code>day, week, month, year</code>，应该根据具体的数据特点和查询需求而确定，设置方法为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sft.getUserData().put(&quot;geomesa.z3.interval&quot;, &quot;month&quot;);</span><br></pre></td></tr></table></figure>
+<h3 id="ID-索引-2">ID 索引</h3>
+<p>默认情况下，Geomesa使用UUID作为每条记录的Feature ID，其格式是一个使用十六进制表示32位字符串：<code>&#123;8&#125;-&#123;4&#125;-&#123;4&#125;-&#123;4&#125;-&#123;12&#125;</code>，例如：<code> 28a12c18-e5ae-4c04-ae7b-bf7cdbfaf234</code>。当然也可以自定义Feature ID：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">// use a geotools SimpleFeatureBuilder to create our features</span><br><span class="line">SimpleFeatureBuilder builder = new SimpleFeatureBuilder(getSimpleFeatureType());</span><br><span class="line"></span><br><span class="line">builder.set(&quot;GLOBALEVENTID&quot;, record.get(0));</span><br><span class="line">builder.set(&quot;Actor1Name&quot;, record.get(6));</span><br><span class="line">builder.set(&quot;Actor1CountryCode&quot;, record.get(7));</span><br><span class="line">......</span><br><span class="line">// be sure to tell GeoTools explicitly that we want to use the ID we provided</span><br><span class="line">builder.featureUserData(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE);</span><br><span class="line"></span><br><span class="line">// build the feature - this also resets the feature builder for the next entry</span><br><span class="line">// use the GLOBALEVENTID as the feature ID</span><br><span class="line">SimpleFeature feature = builder.buildFeature(record.get(0));</span><br><span class="line"></span><br><span class="line">// Insert</span><br><span class="line">FeatureWriter&lt;SimpleFeatureType, SimpleFeature&gt; writer = </span><br><span class="line">                      datastore.getFeatureWriterAppend(sft.getTypeName(), Transaction.AUTO_COMMIT)</span><br><span class="line">SimpleFeature toWrite = writer.next();</span><br><span class="line">// copy attributes</span><br><span class="line">toWrite.setAttributes(feature.getAttributes());</span><br><span class="line">toWrite.getUserData().put(Hints.PROVIDED_FID, feature.getID());</span><br></pre></td></tr></table></figure>
+<h3 id="几何索引精度">几何索引精度</h3>
+<p>使用<code>precision</code>设置几何字段的存储精度，其类型是整形，范围在【-7,7】之间，负数表示小数点左边的精度（保留十位，百位…），整数表示小数位数，小数位数达6位的经纬度坐标，其地理误差在10cm左右。设置方法为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SimpleFeatureType sft = ...</span><br><span class="line">sft.getDescriptor(&quot;geom&quot;).getUserData().put(&quot;precision&quot;, &quot;4&quot;);</span><br></pre></td></tr></table></figure>
+<h3 id="属性索引-2">属性索引</h3>
+<p>对于属性索引，Geomesa可以显示地指定他们的“势”（Cardinality）。即该属性的唯一值数量。对于包含多个属性条件的查询，Geomesa会优先使用“势”高的属性的索引，以过滤更多的无效数据，提高查询效率。例如一个极端情况，属性1只包含两种可能取值，而属性2包含10种，那么当查询条件中同时包含这两个条件时，应该首先使用属性2的索引，再在满足属性2条件下的结果中，找出满足属性1条件的数据。要保证Geomesa优先考虑属性2的索引，则需要定义属性1的势为<code>high</code>，而属性2的势为<code>low</code>，设置方法为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SimpleFeatureType sft = ...</span><br><span class="line">sft.getDescriptor(&quot;name&quot;).getUserData().put(&quot;index&quot;, &quot;true&quot;);</span><br><span class="line">sft.getDescriptor(&quot;name&quot;).getUserData().put(&quot;cardinality&quot;, &quot;high&quot;);</span><br></pre></td></tr></table></figure>
+<h2 id="查询计划">查询计划</h2>
+<p>构建好数据表结构以及相应的索引信息后，Geomesa会通过内置的方法为不同的查询条件设计不同的查询计划，使用不同的索引。但这些自动生成的查询计划不一定是最优的。我们可以输出这些计划，查看执行查询操作时具体使用了哪些索引，从而进行有针对性的改进。输出查询计划方法是在<code>log4j.properties</code>文件中添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log4j.category.org.locationtech.geomesa.index.utils.Explainer=TRACE</span><br></pre></td></tr></table></figure>
+<p>这样在查询过程中，就会自动输出Geomesa的查询计划，一个查询计划的例子如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Running query NumSources &gt; 0 AND BBOX(geom, -120.0,30.0,-75.0,55.0)</span><br><span class="line">Planning &#x27;gdelt-quickstart&#x27; NumSources &gt; 0 AND BBOX(geom, -120.0,30.0,-75.0,55.0)</span><br><span class="line">  Original filter: NumSources &gt; 0 AND BBOX(geom, -120.0,30.0,-75.0,55.0)</span><br><span class="line">  Hints: bin[false] arrow[false] density[false] stats[false] sampling[none]</span><br><span class="line">  Sort: none</span><br><span class="line">  Transforms: none</span><br><span class="line">  Strategy selection:</span><br><span class="line">    Query processing took 1ms for 2 options</span><br><span class="line">    Costs: FilterPlan[AttributeIndex(NumSources,geom,dtg)[NumSources &gt; 0][BBOX(geom, -120.0,30.0,-75.0,55.0)]] (Cost 250 in 3ms); FilterPlan[Z2Index(geom)[BBOX(geom, -120.0,30.0,-75.0,55.0)][NumSources &gt; 0]] (Cost 400 in 0ms)</span><br><span class="line">    Filter plan selected: FilterPlan[AttributeIndex(NumSources,geom,dtg)[NumSources &gt; 0][BBOX(geom, -120.0,30.0,-75.0,55.0)]]</span><br><span class="line">    Filter plans not selected: FilterPlan[Z2Index(geom)[BBOX(geom, -120.0,30.0,-75.0,55.0)][NumSources &gt; 0]]</span><br><span class="line">    Strategy selection took 3ms for 2 options</span><br><span class="line">  Strategy 1 of 1: AttributeIndex(NumSources,geom,dtg)</span><br><span class="line">    Strategy filter: AttributeIndex(NumSources,geom,dtg)[NumSources &gt; 0][BBOX(geom, -120.0,30.0,-75.0,55.0)]</span><br><span class="line">    Geometries: FilterValues(List(POLYGON ((-120 30, -120 55, -75 55, -75 30, -120 30))),true,false)</span><br><span class="line">    Intervals: FilterValues(List(),true,false)</span><br><span class="line">    Plan: BatchScanPlan</span><br><span class="line">      Tables: geomesa.test_geomesa_gdelt_2dquickstart_attr_NumSources_geom_dtg_v8</span><br><span class="line">      Column Families: d</span><br><span class="line">      Ranges (4): [%00;80000000%01;::%00;%ff;%ff;%ff;), [%01;80000000%01;::%01;%ff;%ff;%ff;), [%02;80000000%01;::%02;%ff;%ff;%ff;), [%03;80000000%01;::%03;%ff;%ff;%ff;)</span><br><span class="line">      Iterators (1):</span><br><span class="line">        name:filter-transform-iter, priority:25, class:org.locationtech.geomesa.accumulo.iterators.FilterTransformIterator, properties:&#123;sft=GLOBALEVENTID:String,Actor1Name:String,Actor1CountryCode:String,Actor2Name:String,Actor2CountryCode:String,EventCode:String,NumMentions:Integer,NumSources:Integer,NumArticles:Integer,ActionGeo_Type:Integer,ActionGeo_FullName:String,ActionGeo_CountryCode:String,dtg:Date,*geom:Point:srid=4326;geomesa.index.dtg=&#x27;dtg&#x27;,geomesa.stats.enable=&#x27;true&#x27;,geomesa.indices=&#x27;z3:6:3:geom:dtg,z2:5:3:geom,id:4:3:,attr:8:3:EventCode:geom:dtg,attr:8:3:NumSources:geom:dtg&#x27;, index=attr:8:NumSources:geom:dtg, cql=BBOX(geom, -120.0,30.0,-75.0,55.0)&#125;</span><br><span class="line">    Plan creation took 7ms</span><br><span class="line">  Query planning took 13ms</span><br></pre></td></tr></table></figure>
+<p>可以看到，本次查询使用了<code>AttributeIndex(NumSources,geom,dtg)</code>这一索引。</p>
+<p>Geomesa选择索引的策略主要有两种，基于代价的策略（Cost-Based Strategy, 目前只支持Acculumo数据库）和启发式的策略（Heuristic Strategy），基于代价的策略是通过在存储数据时对数据各个字段分布的统计结果（数量、最大/最小值等），估计使用不同索引的代价，从而确定应该使用哪个索引；而启发式的策略是仅仅根据查询条件（条件字段是属性条件还是几何条件，关系是等于还是范围，属性字段对应的“势”，等等），确定应该使用的索引。设置方法为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Query query = new Query(typeName, ECQL.toFilter(queryCQL));</span><br><span class="line">query.getHints().put(QueryHints.COST_EVALUATION(), CostEvaluation$.MODULE$.Stats()); // 基于代价</span><br><span class="line">query.getHints().put(QueryHints.COST_EVALUATION(), CostEvaluation$.MODULE$.Index()); // 启发式</span><br></pre></td></tr></table></figure>
+<p>当然还有最简单粗暴的方法，直接指定希望使用的索引名字：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Query query = new Query(typeName, ECQL.toFilter(queryCQL));</span><br><span class="line">query.getHints().put(QueryHints.QUERY_INDEX(), &quot;attr:8:rate:coord&quot;);</span><br></pre></td></tr></table></figure>
+<p>其中，<code>attr:8:rate:coord</code>就是指定索引的名字，所有可取的值可以在查询计划中找到。</p>
+<h2 id="结果排序">结果排序</h2>
+<p>在我的使用过程中，还有一个比较重要的发现，就是当查询条件中存在排序指令时，会有大量数据通过网络下载到本地，而且所需时间与查询结果的量成正比，比不带排序命令的速度慢了许多，即便需要排序的字段已经构建了索引，也是如此。查找官方文档后，发现在数据导出模块中，有提到：</p>
+<blockquote>
+<p>The --sort-by argument can be used to sort the output by one or more attributes. <strong>Note that for local exports, this will usually be done in-memory, so can be costly for large result sets.</strong> By default, output is sorted in ascending order; --sort-descending can be used to reverse the sort order.</p>
+</blockquote>
+<p>也就是说，排序操作是获取了全部数据后，在本地执行的，这与我观察到的现象是吻合的。我目前还没有找到更好的办法解决该问题，这里附上我使用的排序操作的API：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// sort by</span><br><span class="line">Query query = new Query(typeName, ECQL.toFilter(queryCQL));</span><br><span class="line">if (!sortBy.equals(&quot;&quot;))&#123;</span><br><span class="line">    FilterFactoryImpl ff = new FilterFactoryImpl();</span><br><span class="line">    query.setSortBy(new SortBy[]&#123;new SortByImpl(</span><br><span class="line">         ff.property(sortBy),</span><br><span class="line">         ascend ? SortOrder.ASCENDING : SortOrder.DESCENDING</span><br><span class="line">     )&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="数据库表构成">数据库表构成</h2>
+<p>我们可以查看数据库实际生成的表，帮助我们理解Geomesa的索引机制，这里使用Accumulo数据库为例。</p>
+<p>我们使用Geomesa Tutorial自带的GDELTData进行试验，其SimpleFeatureType如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">String sft = &quot;GLOBALEVENTID:String,&quot; +</span><br><span class="line">&quot;Actor1Name:String,&quot; +</span><br><span class="line">&quot;Actor1CountryCode:String,&quot; +</span><br><span class="line">&quot;Actor2Name:String,&quot; +</span><br><span class="line">&quot;Actor2CountryCode:String,&quot; +</span><br><span class="line">&quot;EventCode:String:index=true,&quot;+</span><br><span class="line">&quot;NumMentions:Integer,&quot; +</span><br><span class="line">&quot;NumSources:Integer:index=true,&quot; +</span><br><span class="line">&quot;NumArticles:Integer,&quot; +</span><br><span class="line">&quot;ActionGeo_Type:Integer,&quot; +</span><br><span class="line">&quot;ActionGeo_FullName:String,&quot; +</span><br><span class="line">&quot;ActionGeo_CountryCode:String,&quot; +</span><br><span class="line">&quot;dtg:Date,&quot; +</span><br><span class="line">&quot;*geom:Point:srid=4326&quot;</span><br></pre></td></tr></table></figure>
+<p>该SFT定义了一个包含14个字段的数据结构，其中，geom是默认几何数据字段，dtg是默认日期字段，并且还在EventCode和NumSources两个属性字段上构建了索引。使用该数据结构最终生成的数据表如下：<br>
+<img src="https://file.oattao.cn/202112012013422.png" alt="image.png"></p>
+<p>可以看到，<br>
+geomesa.test_geomesa_gdelt_2dquickstart_id_v4 表，是ID索引表，<br>
+geomesa.test_geomesa_gdelt_2dquickstart_z2_geom_v5表，是使用geom字段生成的Z2索引表，<br>
+geomesa.test_geomesa_gdelt_2dquickstart_z3_geom_dtg_v6表，是使用geom字段+dtg字段生成的Z3索引表，<br>
+geomesa.test_geomesa_gdelt_2dquickstart_attr_NumSources_geom_dtg_v8 和<br>
+geomesa.test_geomesa_gdelt_2dquickstart_attr_EventCode_geom_dtg_v8两张表，分别是两个属性字段与geom字段+dtg字段生成索引表；</p>
+<p>我们再到命令行中输出这几张表的前几行：<br>
+<img src="https://file.oattao.cn/202112012013621.png" alt="ID索引表"><br>
+<img src="https://file.oattao.cn/202112012013548.png" alt="Z2索引表"><br>
+<img src="https://file.oattao.cn/202112012013453.png" alt="Z3索引表"><br>
+<img src="https://file.oattao.cn/202112012013367.png" alt="属性索引表"></p>
+<p>虽然大多是二进制的值，但是也不难发现几个规律：</p>
+<ul>
+<li>所有的索引表，其存储的值都是完整的数据（列族“d”），这意味着查询只会在一个表中完成。（Geomesa可以指定一个特定的列族，该列族只存放部分字段，这样可以避免对非查询数据不必要的读取，详见<a target="_blank" rel="noopener" href="https://www.geomesa.org/documentation/user/datastores/index_config.html#configuring-column-groups">Column Groups</a>)；</li>
+<li>ID索引表的键就是Feature ID；</li>
+<li>其他索引表的键，即为该索引的二进制值，并且键的末尾都添加了Feature  ID；</li>
+<li>属性索引表的键比其他Z2，Z3索引表的键都要长，结合其表名判断（如：geomesa.test_geomesa_gdelt_2dquickstart_attr_EventCode_geom_dtg_v8），应该是将属性索引拼接上Z3索引所构成的，目的应该是加快属性+时空条件查询时的速度。</li>
+</ul>
+<h2 id="结语">结语</h2>
+<p>Geomesa的索引还有很多可以配置的选项，由于我目前还没有用到，这里就不列举了。查看全部的详细内容，请阅读<a target="_blank" rel="noopener" href="https://www.geomesa.org/documentation/user/datastores/index.html">官方文档用户手册</a>。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Yuto Zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zyt4321.github.io/post/5066df4.html">https://zyt4321.github.io/post/5066df4.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zyt4321.github.io" target="_blank">於桃君的小仓库</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Geomesa/">Geomesa</a><a class="post-meta__tags" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.80/img_809_480x360_100_null_normal.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/post/390044bc.html"><img class="prev-cover" src="https://file.oattao.cn/202112010904068.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">语音识别笔记(1)-语音信号处理与特征提取</div></div></a></div><div class="next-post pull-right"><a href="/post/e1ca212c.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.27/img_279_1920x1080_350_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">使用python-matplotlib绘制混淆矩阵</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/post/b58e43fa.html" title="GeoMesa-Java-API-写入与查询数据"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.31/img_318_1913x1124_350_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-23</div><div class="title">GeoMesa-Java-API-写入与查询数据</div></div></a></div><div><a href="/post/63d1671a.html" title="GeoMesa-从GDELT中写入数据"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_470_2901x2000_92_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-04</div><div class="title">GeoMesa-从GDELT中写入数据</div></div></a></div><div><a href="/post/27306652.html" title="GeoMesa的安装与Quick-Start【HBase】"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.26/img_267_1920x1080_72_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-03</div><div class="title">GeoMesa的安装与Quick-Start【HBase】</div></div></a></div><div><a href="/post/389da9b5.html" title="NiFi的分布式安装与启动"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.7/img_70_2133x1200_600_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-19</div><div class="title">NiFi的分布式安装与启动</div></div></a></div><div><a href="/post/ceacc06f.html" title="使用Java-API远程访问HDFS"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.65/img_659_1141x1614_600_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-10</div><div class="title">使用Java-API远程访问HDFS</div></div></a></div><div><a href="/post/a68baeee.html" title="使用NiFi将数据从Mysql导入至HBase"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.84/img_849_1889x1336_96_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-25</div><div class="title">使用NiFi将数据从Mysql导入至HBase</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Geomesa%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%88%AB"><span class="toc-number">1.</span> <span class="toc-text">Geomesa索引类别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Z2%E4%B8%8EZ3%E7%B4%A2%E5%BC%95"><span class="toc-number">1.1.</span> <span class="toc-text">Z2与Z3索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XZ2%E5%92%8CXZ3%E7%B4%A2%E5%BC%95"><span class="toc-number">1.2.</span> <span class="toc-text">XZ2和XZ3索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ID-%E7%B4%A2%E5%BC%95"><span class="toc-number">1.3.</span> <span class="toc-text">ID 索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E7%B4%A2%E5%BC%95"><span class="toc-number">1.4.</span> <span class="toc-text">属性索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Geomesa%E5%AE%9A%E4%B9%89%E8%A1%A8%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">Geomesa定义表结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Geomesa%E7%B4%A2%E5%BC%95%E8%AE%BE%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">Geomesa索引设置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E7%B4%A2%E5%BC%95"><span class="toc-number">3.1.</span> <span class="toc-text">默认索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E6%97%B6%E7%A9%BA%E7%B4%A2%E5%BC%95"><span class="toc-number">3.2.</span> <span class="toc-text">多时空索引</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A5%E6%9C%9F%E7%B4%A2%E5%BC%95"><span class="toc-number">3.2.1.</span> <span class="toc-text">日期索引</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ID-%E7%B4%A2%E5%BC%95-2"><span class="toc-number">3.3.</span> <span class="toc-text">ID 索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%A0%E4%BD%95%E7%B4%A2%E5%BC%95%E7%B2%BE%E5%BA%A6"><span class="toc-number">3.4.</span> <span class="toc-text">几何索引精度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E7%B4%A2%E5%BC%95-2"><span class="toc-number">3.5.</span> <span class="toc-text">属性索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E8%AE%A1%E5%88%92"><span class="toc-number">4.</span> <span class="toc-text">查询计划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%E6%8E%92%E5%BA%8F"><span class="toc-number">5.</span> <span class="toc-text">结果排序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8%E6%9E%84%E6%88%90"><span class="toc-number">6.</span> <span class="toc-text">数据库表构成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E8%AF%AD"><span class="toc-number">7.</span> <span class="toc-text">结语</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2018 - 2021 By Yuto Zh</div><div class="footer_custom_text">赣ICP备15011558号</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.css"><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(()=>{
+  const $countDom = document.getElementById('twikoo-count')
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: ''
+    }, null))
+  }
+
+  const getCount = () => {
+    twikoo.getCommentsCount({
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      $countDom.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const loadTwikoo = (bool = false) => {
+    if (typeof twikoo === 'object') {
+      init()
+      bool && $countDom && setTimeout(getCount,0)
+    } else {
+      getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(()=> {
+        init()
+        bool && $countDom && setTimeout(getCount,0)
+      })
+    }
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo(true)
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="/js/user_afterload.js"></script><script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script><link rel="stylesheet" href="/css"><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/about/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
+  window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

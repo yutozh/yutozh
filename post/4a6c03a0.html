@@ -1,0 +1,453 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>完全分布式HBase环境搭建【主要流程记录】 | 於桃君的小仓库</title><meta name="keywords" content="学习笔记,大数据,HBase"><meta name="author" content="Yuto Zh"><meta name="copyright" content="Yuto Zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文记录了完全分布式Hbase数据库安装过程中的主要流程以及遇到的问题。 若要查看详细操作步骤可以参考文末的资料。 #1 安装HDFS 架构 3台虚拟机，名字分别为master，hadoop-2，hadoop-3。其中master为NameNode，其余机器为DataNode。 系统环境 Ubuntu 18.04操作系统 Hadoop版本 2.7.7 流程 (1&#x2F;6) 先创建一台主机，完成基础配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="完全分布式HBase环境搭建【主要流程记录】">
+<meta property="og:url" content="https://zyt4321.github.io/post/4a6c03a0.html">
+<meta property="og:site_name" content="於桃君的小仓库">
+<meta property="og:description" content="本文记录了完全分布式Hbase数据库安装过程中的主要流程以及遇到的问题。 若要查看详细操作步骤可以参考文末的资料。 #1 安装HDFS 架构 3台虚拟机，名字分别为master，hadoop-2，hadoop-3。其中master为NameNode，其余机器为DataNode。 系统环境 Ubuntu 18.04操作系统 Hadoop版本 2.7.7 流程 (1&#x2F;6) 先创建一台主机，完成基础配置">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.33/img_333_2560x1440_72_null_normal.jpg">
+<meta property="article:published_time" content="2018-11-03T10:08:52.000Z">
+<meta property="article:modified_time" content="2021-12-15T06:52:14.812Z">
+<meta property="article:author" content="Yuto Zh">
+<meta property="article:tag" content="大数据">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.33/img_333_2560x1440_72_null_normal.jpg"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://zyt4321.github.io/post/4a6c03a0"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.js" defer></script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?526cd666012561974990381acfd5535e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"PG8YF6H1J2","apiKey":"ce412ecd71d1ba81bbd6d11fb1685148","indexName":"butterfly-blog","hits":{"per_page":"6s"},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Yuto Zh","link":"链接: ","source":"来源: 於桃君的小仓库","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '完全分布式HBase环境搭建【主要流程记录】',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-12-15 14:52:14'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    document.addEventListener('pjax:complete', detectApple)})(window)</script><link rel="stylesheet" href="/css/beauty.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yutozh/CDN@2.0/fontawesome-pro-master/css/all.min.css"><meta name="generator" content="Hexo 5.4.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">於桃君的小仓库</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">完全分布式HBase环境搭建【主要流程记录】</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2018-11-03T10:08:52.000Z" title="发表于 2018-11-03 18:08:52">2018-11-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-15T06:52:14.812Z" title="更新于 2021-12-15 14:52:14">2021-12-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="完全分布式HBase环境搭建【主要流程记录】"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>本文记录了完全分布式Hbase数据库安装过程中的主要流程以及遇到的问题。<br>
+若要查看详细操作步骤可以参考文末的资料。</p>
+<p>#1 安装HDFS</p>
+<h4 id="架构">架构</h4>
+<p>3台虚拟机，名字分别为master，hadoop-2，hadoop-3。其中master为NameNode，其余机器为DataNode。</p>
+<h4 id="系统环境">系统环境</h4>
+<p>Ubuntu 18.04操作系统</p>
+<h4 id="Hadoop版本">Hadoop版本</h4>
+<p>2.7.7</p>
+<h4 id="流程">流程</h4>
+<h6 id="1-6-先创建一台主机，完成基础配置，避免重复的工作">(1/6) 先创建一台主机，完成基础配置，避免重复的工作</h6>
+<ol>
+<li>使用Vmware软件，虚拟出1台主机，命名为master，作为Master节点，并安装Ubuntu18.04操作系统。</li>
+<li>在这台机器中，配置 hadoop 用户、安装 SSH server、安装 Java 环境、设置环境变量、安装必要的软件(vim,curl,wget等)。</li>
+</ol>
+<h6 id="2-6-克隆主机，修改网卡，修改hosts文件">(2/6) 克隆主机，修改网卡，修改hosts文件</h6>
+<ol>
+<li>克隆两个副本，分别命名为hadoop-2和hadoop-3。</li>
+<li>开机前先修改副本的网卡地址（Mac地址），开机后确保ip互不相同。</li>
+<li>修改主机名，修改hosts文件使主机名与ip地址对应。【127.0.0.1   localhost】一项需保留，文件IPv4部分的其他已有条目可删除。</li>
+</ol>
+<p><img src="https://file.oattao.cn/202112151447243.jpeg" alt="hosts.jpg"></p>
+<h6 id="3-6-配置ssh，使master可无密码登录至所有节点">(3/6) 配置ssh，使master可无密码登录至所有节点</h6>
+<ol>
+<li>在master中生成密钥，将生成的id_rsa.pub文件追加到authorized_keys文件中；</li>
+<li>将master中生成的id_rsa.pub文件拷贝到hadoop2和hadoop3节点中，分别追加至authorized_keys文件中；</li>
+<li>使用ssh测试能否从master节点无密码登录master、hadoop2、hadoop3节点。</li>
+</ol>
+<h6 id="4-6-在master中安装Hadoop，修改配置文件">(4/6) 在master中安装Hadoop，修改配置文件</h6>
+<ol>
+<li>解压hadoop文件至/usr/local文件夹，使用 <em>chown -R</em> 命令修改文件所属；</li>
+<li>修改/usr/local/hadoop/etc/hadoop 中的5个配置文件：slaves、<a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r2.6.0/hadoop-project-dist/hadoop-common/core-default.xml">core-site.xml</a>、<a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r2.6.0/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">hdfs-site.xml</a>、<a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r2.6.0/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml">mapred-site.xml</a>、<a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r2.6.0/hadoop-yarn/hadoop-yarn-common/yarn-default.xml">yarn-site.xml</a></li>
+<li>具体内容如下：</li>
+</ol>
+<ul>
+<li>slaves</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hadoop-2</span><br><span class="line">hadoop-3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>core-site.xml</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;file:/usr/local/hadoop/tmp&lt;/value&gt;</span><br><span class="line">                &lt;description&gt;Abase for other temporary directories.&lt;/description&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>hdfs-site,xml</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;master:50090&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;2&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;file:/usr/local/hadoop/tmp/dfs/name&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;file:/usr/local/hadoop/tmp/dfs/data&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>mapred-site.xml</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;master:10020&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>yarn-site.xml</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;master&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">                &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">                &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<h6 id="5-6-将master中的hadoop复制到其他节点中">(5/6) 将master中的hadoop复制到其他节点中</h6>
+<ol>
+<li>打包hadoop文件夹中所有文件，拷贝到hadoop-2、hadoop-3中；</li>
+<li>在hadoop-2、hadoop-3中分别解压，到/usr/local目录下，修改所属用户。</li>
+</ol>
+<h6 id="6-6-运行hadoop，验证是否安装成功">(6/6) 运行hadoop，验证是否安装成功</h6>
+<ol>
+<li>格式化，在master运行：hdfs namenode -format</li>
+<li>启动hadoop：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start-dfs.sh</span><br><span class="line">start-yarn.sh</span><br><span class="line">mr-jobhistory-daemon.sh start historyserver</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>通过web查看运行状态：<a target="_blank" rel="noopener" href="http://master:50070">http://master:50070</a>；</li>
+<li>关闭hadoop：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">stop-yarn.sh</span><br><span class="line">stop-dfs.sh</span><br><span class="line">mr-jobhistory-daemon.sh stop historyserver</span><br></pre></td></tr></table></figure>
+<p><strong>至此，HDFS就安装成功了，可以在其上面运行MapReduce任务等操作。</strong></p>
+<p>#2 安装HBase</p>
+<h4 id="HBase-版本">HBase 版本</h4>
+<p>1.3.2</p>
+<h4 id="架构-2">架构</h4>
+<table>
+<thead>
+<tr>
+<th>Node Name</th>
+<th>Master</th>
+<th>ZooKeeper</th>
+<th>RegionServer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>master</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>hadoop-2</td>
+<td>backup</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>hadoop-3</td>
+<td>no</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h4 id="流程-2">流程</h4>
+<h6 id="1-4-在master中安装HBase，修改配置文件">(1/4) 在master中安装HBase，修改配置文件</h6>
+<ol>
+<li>解压HBase文件至/usr/local文件夹，使用 <em>chown -R</em> 命令修改文件所属；</li>
+<li>修改/usr/local/hbase/conf下的配置文件：regionservers，backup-masters，hbase-site.xml</li>
+<li>具体内容如下：</li>
+</ol>
+<ul>
+<li>regionservers</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hadoop-2</span><br><span class="line">hadoop-3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>backup-masters (若没有，需要手动创建)</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop-2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>hbase-site.xml</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;hbase.cluster.distributed&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;true&lt;/value&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;hbase.rootdir&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;hdfs://master:9000/hbase&lt;/value&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;hbase.zookeeper.quorum&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;master,hadoop-2,hadoop-3&lt;/value&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;hbase.zookeeper.property.dataDir&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;/usr/local/zookeeper&lt;/value&gt;</span><br><span class="line">&lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<h6 id="2-4-在hadoop-2中，进行中安装Hadoop的第3步，使得hadoop-2可以无密码登录所有节点">(2/4) 在hadoop-2中，进行中安装Hadoop的第3步，使得hadoop-2可以无密码登录所有节点</h6>
+<p>进行这一步的原因是hadoop-2作为master的备份，也需要访问的其他节点权限。具体步骤参考安装Hadoop的第3步。</p>
+<h6 id="3-4-将hbase文件夹复制到其他节点中">(3/4) 将hbase文件夹复制到其他节点中</h6>
+<ol>
+<li>打包hbase文件夹中所有文件，拷贝到hadoop-2、hadoop-3中；</li>
+<li>在hadoop-2、hadoop-3中分别解压，到/usr/local目录下，修改所属用户。</li>
+</ol>
+<h6 id="4-4-运行hbase，验证是否安装成功">(4/4) 运行hbase，验证是否安装成功</h6>
+<ol>
+<li>启动hbase：<a target="_blank" rel="noopener" href="http://start-hbase.sh">start-hbase.sh</a>；</li>
+<li>使用jps查看进程，按照以上步骤安装后，正常情况下的输出结果为 (id可以不同)：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">master</span><br><span class="line">26721 NameNode</span><br><span class="line">31985 HMaster</span><br><span class="line">31906 HQuorumPeer</span><br><span class="line">26981 SecondaryNameNode</span><br><span class="line">34088 Bootstrap</span><br><span class="line">36489 Jps</span><br><span class="line">27148 ResourceManager</span><br><span class="line">27437 JobHistoryServer</span><br><span class="line"></span><br><span class="line">hadoop-2</span><br><span class="line">19968 Jps</span><br><span class="line">15056 DataNode</span><br><span class="line">18802 HMaster</span><br><span class="line">18506 HQuorumPeer</span><br><span class="line">15228 NodeManager</span><br><span class="line">18653 HRegionServer</span><br><span class="line"></span><br><span class="line">hadoop-3</span><br><span class="line">12592 NodeManager</span><br><span class="line">14946 HRegionServer</span><br><span class="line">12422 DataNode</span><br><span class="line">14792 HQuorumPeer</span><br><span class="line">16090 Jps</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>进入hbase命令行：hbase shell；</li>
+<li>完成基本的创建表，查询，删除等<a target="_blank" rel="noopener" href="https://hbase.apache.org/book.html#shell_exercises">操作</a>。若能正常运行，则说明安装成功；</li>
+<li>通过web查看HBase运行状态：<a target="_blank" rel="noopener" href="http://master:16010">http://master:16010</a></li>
+<li>停止hbase：<a target="_blank" rel="noopener" href="http://stop-hbase.sh">stop-hbase.sh</a></li>
+</ol>
+<p><strong>这样，HBase 就安装成功了。</strong></p>
+<p><strong>关机时，要先关闭HBase ，再关闭yarn和hdfs。不正确的关闭顺序可能导致下次HBase 无法正常启动</strong></p>
+<p>#3 遇到的问题<br>
+#####1. 启动Hadoop或HBase 时，提示JAVA_HOME没有设置，但实际上已经在/etc/profile中设置了。<br>
+<strong>解决</strong>：分别在hadoop的 <a target="_blank" rel="noopener" href="http://hadoop-env.xn--shhbasehbase-env-e02zp94e0x7em9td.sh">hadoop-env.sh文件和hbase的hbase-env.sh</a> 文件中，再次设置JAVA_HOME即可。</p>
+<h5 id="2-重新格式化HDFS后，再次启动hadoop失败">2. 重新格式化HDFS后，再次启动hadoop失败</h5>
+<p><strong>解决</strong>：在格式化之前，需要删除每个节点hadoop文件夹下的tmp文件夹和logs文件夹，以删除之前的数据和日志。</p>
+<h5 id="3-HBase-启动失败">3. HBase 启动失败</h5>
+<p><strong>解决</strong>：导致HBase 启动失败的原因有很多，我遇到的主要有以下几个：</p>
+<ul>
+<li>在配置文件中指定的zookeeper存放目录，没有访问权限。需要将其所有者设置为当前用户</li>
+<li>hosts文件配置错误，或者有不必要的项目</li>
+<li>检查主节点master和备份主节点hadoop-2能否无密码登录所有节点，包括自身</li>
+</ul>
+<p>如果尝试过很多方案都没有效果，那么最好的办法是<strong>重装一遍</strong>，避免浪费更多的时间。</p>
+<h5 id="4-安装curl失败，原因是curl的某个依赖包在本地已存在一个更高的版本。">4. 安装curl失败，原因是curl的某个依赖包在本地已存在一个更高的版本。</h5>
+<p><strong>解决</strong>：尝试使用aptitude完成降级安装，但遇到新的错误。最终我是将那个已安装的依赖包删除，才装上了curl。<br>
+<strong>警告</strong>：装好后过了一段时间，这台主机莫名其妙的断网并且无法进入图形界面，不知道是不是和我删除了那个依赖包有关。因此不推荐删除依赖包的方法。</p>
+<h3 id="参考资料-有详细步骤">参考资料(有详细步骤)</h3>
+<p><a target="_blank" rel="noopener" href="http://dblab.xmu.edu.cn/blog/install-hadoop-cluster/">Hadoop集群安装配置教程_Hadoop2.6.0_Ubuntu/CentOS</a><br>
+<a target="_blank" rel="noopener" href="https://hbase.apache.org/book.html#quickstart_fully_distributed">HBase 官方文档</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Yuto Zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zyt4321.github.io/post/4a6c03a0.html">https://zyt4321.github.io/post/4a6c03a0.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zyt4321.github.io" target="_blank">於桃君的小仓库</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a><a class="post-meta__tags" href="/tags/HBase/">HBase</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.33/img_333_2560x1440_72_null_normal.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/post/27306652.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.26/img_267_1920x1080_72_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">GeoMesa的安装与Quick-Start【HBase】</div></div></a></div><div class="next-post pull-right"><a href="/post/a349a0c1.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_474_1920x1080_96_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">WebGIS中的坐标系和瓦片地图</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/post/27306652.html" title="GeoMesa的安装与Quick-Start【HBase】"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.26/img_267_1920x1080_72_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-03</div><div class="title">GeoMesa的安装与Quick-Start【HBase】</div></div></a></div><div><a href="/post/b58e43fa.html" title="GeoMesa-Java-API-写入与查询数据"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.31/img_318_1913x1124_350_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-23</div><div class="title">GeoMesa-Java-API-写入与查询数据</div></div></a></div><div><a href="/post/63d1671a.html" title="GeoMesa-从GDELT中写入数据"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_470_2901x2000_92_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-04</div><div class="title">GeoMesa-从GDELT中写入数据</div></div></a></div><div><a href="/post/5066df4.html" title="Geomesa-索引"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.80/img_809_480x360_100_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-12</div><div class="title">Geomesa-索引</div></div></a></div><div><a href="/post/389da9b5.html" title="NiFi的分布式安装与启动"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.7/img_70_2133x1200_600_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-19</div><div class="title">NiFi的分布式安装与启动</div></div></a></div><div><a href="/post/ceacc06f.html" title="使用Java-API远程访问HDFS"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.65/img_659_1141x1614_600_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-10</div><div class="title">使用Java-API远程访问HDFS</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%8E%AF%E5%A2%83"><span class="toc-number">2.</span> <span class="toc-text">系统环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Hadoop%E7%89%88%E6%9C%AC"><span class="toc-number">3.</span> <span class="toc-text">Hadoop版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">流程</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-6-%E5%85%88%E5%88%9B%E5%BB%BA%E4%B8%80%E5%8F%B0%E4%B8%BB%E6%9C%BA%EF%BC%8C%E5%AE%8C%E6%88%90%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE%EF%BC%8C%E9%81%BF%E5%85%8D%E9%87%8D%E5%A4%8D%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="toc-number">4.0.1.</span> <span class="toc-text">(1&#x2F;6) 先创建一台主机，完成基础配置，避免重复的工作</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-6-%E5%85%8B%E9%9A%86%E4%B8%BB%E6%9C%BA%EF%BC%8C%E4%BF%AE%E6%94%B9%E7%BD%91%E5%8D%A1%EF%BC%8C%E4%BF%AE%E6%94%B9hosts%E6%96%87%E4%BB%B6"><span class="toc-number">4.0.2.</span> <span class="toc-text">(2&#x2F;6) 克隆主机，修改网卡，修改hosts文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-6-%E9%85%8D%E7%BD%AEssh%EF%BC%8C%E4%BD%BFmaster%E5%8F%AF%E6%97%A0%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95%E8%87%B3%E6%89%80%E6%9C%89%E8%8A%82%E7%82%B9"><span class="toc-number">4.0.3.</span> <span class="toc-text">(3&#x2F;6) 配置ssh，使master可无密码登录至所有节点</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-6-%E5%9C%A8master%E4%B8%AD%E5%AE%89%E8%A3%85Hadoop%EF%BC%8C%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">4.0.4.</span> <span class="toc-text">(4&#x2F;6) 在master中安装Hadoop，修改配置文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-6-%E5%B0%86master%E4%B8%AD%E7%9A%84hadoop%E5%A4%8D%E5%88%B6%E5%88%B0%E5%85%B6%E4%BB%96%E8%8A%82%E7%82%B9%E4%B8%AD"><span class="toc-number">4.0.5.</span> <span class="toc-text">(5&#x2F;6) 将master中的hadoop复制到其他节点中</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-6-%E8%BF%90%E8%A1%8Chadoop%EF%BC%8C%E9%AA%8C%E8%AF%81%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F"><span class="toc-number">4.0.6.</span> <span class="toc-text">(6&#x2F;6) 运行hadoop，验证是否安装成功</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HBase-%E7%89%88%E6%9C%AC"><span class="toc-number">5.</span> <span class="toc-text">HBase 版本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84-2"><span class="toc-number">6.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B-2"><span class="toc-number">7.</span> <span class="toc-text">流程</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-4-%E5%9C%A8master%E4%B8%AD%E5%AE%89%E8%A3%85HBase%EF%BC%8C%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">7.0.1.</span> <span class="toc-text">(1&#x2F;4) 在master中安装HBase，修改配置文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-4-%E5%9C%A8hadoop-2%E4%B8%AD%EF%BC%8C%E8%BF%9B%E8%A1%8C%E4%B8%AD%E5%AE%89%E8%A3%85Hadoop%E7%9A%84%E7%AC%AC3%E6%AD%A5%EF%BC%8C%E4%BD%BF%E5%BE%97hadoop-2%E5%8F%AF%E4%BB%A5%E6%97%A0%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95%E6%89%80%E6%9C%89%E8%8A%82%E7%82%B9"><span class="toc-number">7.0.2.</span> <span class="toc-text">(2&#x2F;4) 在hadoop-2中，进行中安装Hadoop的第3步，使得hadoop-2可以无密码登录所有节点</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-4-%E5%B0%86hbase%E6%96%87%E4%BB%B6%E5%A4%B9%E5%A4%8D%E5%88%B6%E5%88%B0%E5%85%B6%E4%BB%96%E8%8A%82%E7%82%B9%E4%B8%AD"><span class="toc-number">7.0.3.</span> <span class="toc-text">(3&#x2F;4) 将hbase文件夹复制到其他节点中</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-4-%E8%BF%90%E8%A1%8Chbase%EF%BC%8C%E9%AA%8C%E8%AF%81%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F"><span class="toc-number">7.0.4.</span> <span class="toc-text">(4&#x2F;4) 运行hbase，验证是否安装成功</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E9%87%8D%E6%96%B0%E6%A0%BC%E5%BC%8F%E5%8C%96HDFS%E5%90%8E%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8hadoop%E5%A4%B1%E8%B4%A5"><span class="toc-number">7.1.</span> <span class="toc-text">2. 重新格式化HDFS后，再次启动hadoop失败</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-HBase-%E5%90%AF%E5%8A%A8%E5%A4%B1%E8%B4%A5"><span class="toc-number">7.2.</span> <span class="toc-text">3. HBase 启动失败</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%AE%89%E8%A3%85curl%E5%A4%B1%E8%B4%A5%EF%BC%8C%E5%8E%9F%E5%9B%A0%E6%98%AFcurl%E7%9A%84%E6%9F%90%E4%B8%AA%E4%BE%9D%E8%B5%96%E5%8C%85%E5%9C%A8%E6%9C%AC%E5%9C%B0%E5%B7%B2%E5%AD%98%E5%9C%A8%E4%B8%80%E4%B8%AA%E6%9B%B4%E9%AB%98%E7%9A%84%E7%89%88%E6%9C%AC%E3%80%82"><span class="toc-number">7.3.</span> <span class="toc-text">4. 安装curl失败，原因是curl的某个依赖包在本地已存在一个更高的版本。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99-%E6%9C%89%E8%AF%A6%E7%BB%86%E6%AD%A5%E9%AA%A4"><span class="toc-number"></span> <span class="toc-text">参考资料(有详细步骤)</span></a></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2018 - 2021 By Yuto Zh</div><div class="footer_custom_text">赣ICP备15011558号</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.css"><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(()=>{
+  const $countDom = document.getElementById('twikoo-count')
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: ''
+    }, null))
+  }
+
+  const getCount = () => {
+    twikoo.getCommentsCount({
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      $countDom.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const loadTwikoo = (bool = false) => {
+    if (typeof twikoo === 'object') {
+      init()
+      bool && $countDom && setTimeout(getCount,0)
+    } else {
+      getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(()=> {
+        init()
+        bool && $countDom && setTimeout(getCount,0)
+      })
+    }
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo(true)
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="/js/user_afterload.js"></script><script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script><link rel="stylesheet" href="/css"><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/about/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
+  window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

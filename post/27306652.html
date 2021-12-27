@@ -1,0 +1,444 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GeoMesa的安装与Quick-Start【HBase】 | 於桃君的小仓库</title><meta name="keywords" content="Geomesa,学习笔记,大数据,HBase"><meta name="author" content="Yuto Zh"><meta name="copyright" content="Yuto Zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="GeoMesa是一个运行在分布式计算系统上，支持大规模时空矢量数据查询和分析的开源工具。 本文介绍GeoMesa安装，以及来自官方的Quick Start教程（基于HBase）。 ###第一部分 GeoMesa的安装 ######1.下载 从Github下载已经编译好的二进制文件，解压至目标目录 123456# download and unpackage the most recent dist">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GeoMesa的安装与Quick-Start【HBase】">
+<meta property="og:url" content="https://zyt4321.github.io/post/27306652.html">
+<meta property="og:site_name" content="於桃君的小仓库">
+<meta property="og:description" content="GeoMesa是一个运行在分布式计算系统上，支持大规模时空矢量数据查询和分析的开源工具。 本文介绍GeoMesa安装，以及来自官方的Quick Start教程（基于HBase）。 ###第一部分 GeoMesa的安装 ######1.下载 从Github下载已经编译好的二进制文件，解压至目标目录 123456# download and unpackage the most recent dist">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.26/img_267_1920x1080_72_null_normal.jpg">
+<meta property="article:published_time" content="2018-11-03T14:01:52.000Z">
+<meta property="article:modified_time" content="2021-12-15T06:46:04.252Z">
+<meta property="article:author" content="Yuto Zh">
+<meta property="article:tag" content="Geomesa">
+<meta property="article:tag" content="大数据">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.26/img_267_1920x1080_72_null_normal.jpg"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://zyt4321.github.io/post/27306652"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.js" defer></script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?526cd666012561974990381acfd5535e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"PG8YF6H1J2","apiKey":"ce412ecd71d1ba81bbd6d11fb1685148","indexName":"butterfly-blog","hits":{"per_page":"6s"},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Yuto Zh","link":"链接: ","source":"来源: 於桃君的小仓库","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'GeoMesa的安装与Quick-Start【HBase】',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2021-12-15 14:46:04'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    document.addEventListener('pjax:complete', detectApple)})(window)</script><link rel="stylesheet" href="/css/beauty.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yutozh/CDN@2.0/fontawesome-pro-master/css/all.min.css"><meta name="generator" content="Hexo 5.4.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">於桃君的小仓库</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">GeoMesa的安装与Quick-Start【HBase】</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2018-11-03T14:01:52.000Z" title="发表于 2018-11-03 22:01:52">2018-11-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-15T06:46:04.252Z" title="更新于 2021-12-15 14:46:04">2021-12-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>13分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="GeoMesa的安装与Quick-Start【HBase】"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>GeoMesa是一个运行在分布式计算系统上，支持大规模时空矢量数据查询和分析的开源工具。</p>
+<p>本文介绍GeoMesa安装，以及来自官方的Quick Start教程（基于HBase）。</p>
+<p>###第一部分 GeoMesa的安装<br>
+######1.下载<br>
+从<a target="_blank" rel="noopener" href="https://github.com/locationtech/geomesa/releases">Github</a>下载已经编译好的二进制文件，解压至目标目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># download and unpackage the most recent distribution:</span><br><span class="line">wget &quot;https://github.com/locationtech/geomesa/releases/download/geomesa_2.11-$VERSION/geomesa-hbase-dist_2.11-$VERSION-bin.tar.gz&quot;</span><br><span class="line">tar xvf geomesa-hbase-dist_2.11-$VERSION-bin.tar.gz</span><br><span class="line">cd geomesa-hbase-dist_2.11-$VERSION</span><br><span class="line">ls</span><br><span class="line">bin/  conf/  dist/  docs/  examples/  lib/  LICENSE.txt  logs/</span><br></pre></td></tr></table></figure>
+<p>或者下载源码，使用Maven手动编译<br>
+######2.配置classpath<br>
+GeoMesa for HBase需要使用Hadoop和HBase，读取他们的配置文件，因此需要设置几个环境变量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export HADOOP_HOME=/path/to/hadoop</span><br><span class="line">export HBASE_HOME=/path/to/hbase</span><br><span class="line">export GEOMESA_HBASE_HOME=/opt/geomesa</span><br><span class="line">export PATH=&quot;$&#123;PATH&#125;:$&#123;GEOMESA_HOME&#125;/bin&quot;</span><br></pre></td></tr></table></figure>
+<p>GeoMesa 推荐在geomesa-hbase_2.11-$VERSION/conf/geomesa-env.sh文件中设置以上环境变量，也可以在.bashrc或/etc/profile中设置。</p>
+<p>由于许可的原因，需要手动执行以下命令，安装两个插件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bin/install-jai.sh</span><br><span class="line">bin/install-jline.sh</span><br></pre></td></tr></table></figure>
+<p>######3.部署jar包<br>
+GeoMesa for HBase需要使用本地过滤器来加速查询，因此需要将GeoMesa的runtime JAR包，拷贝到HBase的库目录下。</p>
+<p>官网给的默认设置是拷贝至HDFS中，其中${hbase.dynamic.jars.dir}是${hbase.rootdir}/lib：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop fs -put $&#123;GEOMESA_HBASE_HOME&#125;/dist/hbase/geomesa-hbase-distributed-runtime-$VERSION.jar $&#123;hbase.dynamic.jars.dir&#125;/</span><br></pre></td></tr></table></figure>
+<p>但我执行了却不起作用，而是要将这个jar包复制到HBase的安装目录的lib文件夹中。<br>
+<strong>注意</strong>：如果是分布式环境，需要将其复制到每一个节点。</p>
+<p>######4. 注册协处理器（Coprocessors）<br>
+注册的过程其实就是使HBase在运行时能够访问到geomesa-hbase-distributed-runtime的jar包。官网给出了几种方法实现这一目标，最方便的是在HBase的配置文件hbase-site.xml添加如下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;property&gt;</span><br><span class="line">  &lt;name&gt;hbase.coprocessor.user.region.classes&lt;/name&gt;</span><br><span class="line">  &lt;value&gt;org.locationtech.geomesa.hbase.coprocessor.GeoMesaCoprocessor&lt;/value&gt;</span><br><span class="line">&lt;/property&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong>：如果是分布式环境，需要在每一个节点都添加相同的内容。<br>
+######5. 设置命令行工具<br>
+在完成以上设置后，GeoMesa的主要部分就安装完成了。可以使用 <code>bin/geomesa-hbase</code> 命令调用GeoMesa的命令行工具，执行一系列的功能。</p>
+<p>这里要额外设置的是使用如下命令，将HBase配置文件hbase-site.xml打包进geomesa-hbase-datastore_2.11-$VERSION.jar中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zip -r lib/geomesa-hbase-datastore_2.11-$VERSION.jar hbase-site.xml</span><br></pre></td></tr></table></figure>
+<p>这一步的目的是确保在MapReduce任务中，GeoMesa能够顺利访问到该文件。</p>
+<p>######6.在Geoserver中安装GeoMesa插件（可选）<br>
+这一步是为了使用GeoMesa作为数据源，在geoserver中发布标准地图服务，进行可视化的工作。如果没有这个需求可以忽略。</p>
+<ul>
+<li>
+<p>首先安装Geoserver，这里省略，可以查看参考资料。</p>
+</li>
+<li>
+<p>geoserver安装成功后，将以下的jar包复制到geoserver/WEB-INF/lib目录下。</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">hadoop-annotations-2.7.4.jar</span><br><span class="line">hadoop-auth-2.7.4.jar</span><br><span class="line">hadoop-common-2.7.4.jar</span><br><span class="line">hadoop-mapreduce-client-core-2.7.4.jar</span><br><span class="line">hadoop-yarn-api-2.7.4.jar</span><br><span class="line">hadoop-yarn-common-2.7.4.jar</span><br><span class="line">htrace-core-3.1.0-incubating.jar</span><br><span class="line">commons-cli-1.2.jar</span><br><span class="line">commons-io-2.5.jar // (you may need to remove an older version (2.1) from geoserver)</span><br><span class="line">hbase-common-1.2.6.jar</span><br><span class="line">hbase-client-1.2.6.jar</span><br><span class="line">hbase-server-1.2.6.jar</span><br><span class="line">hbase-protocol-1.2.6.jar</span><br><span class="line">metrics-core-2.2.0.jar</span><br><span class="line">netty-3.6.2.Final.jar</span><br><span class="line">netty-all-4.0.41.Final.jar</span><br><span class="line">zookeeper-3.4.10.jar</span><br><span class="line">commons-configuration-1.6.jar</span><br></pre></td></tr></table></figure>
+<ul>
+<li>
+<p>再将<code>$GEOMESA_HBASE_HOME/dist/gs-plugins/geomesa-hbase-gs-plugin_2.11-$VERSION-install.tar.gz</code>文件解压，把得到的jar包复制到geoserver/WEB-INF/lib目录。<br>
+<strong>注意</strong>：要移除geoserver/WEB-INF/lib目录下的jackson-core-2.5.0.jar文件，使用更新的版本jackson-core-2.6.x.jar替换。</p>
+</li>
+<li>
+<p>最后，在geoserver/WEB-INF/classes目录下，创建软连接，使其能够访问HBase配置文件hbase-site.xml：</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s /path/to/hbase-site.xml /path/to/geoserver/WEB-INF/classes/hbase-site.xml</span><br></pre></td></tr></table></figure>
+<p>启动Tomcat，访问Geoserver后台，在新建数据源的选项中可以看到HBase(GeoMesa)的选项，说明安装成功了，如下图所示。<br>
+<img src="https://file.oattao.cn/202112151444276.jpeg" alt="geoserver新建图层.jpg"></p>
+<p>不过，目前HBase中还没有数据，不能发布地图服务。在Quick Start中，我们会往HBase中写入数据，并使用Geoserver进行可视化。</p>
+<p>###第二部分 Quick Start教程</p>
+<p>######1.下载并构建教程<br>
+下载：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/geomesa/geomesa-tutorials.git</span><br><span class="line">cd geomesa-tutorials</span><br></pre></td></tr></table></figure>
+<p>切换至你正在使用的GeoMesa版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout tags/geomesa-tutorials-$TUTORIAL_VERSION</span><br></pre></td></tr></table></figure>
+<p>查看pom.xml文件，修改hadoop和hbase版本，要和你已安装的版本保持一致。修改后，使用maven进行构建：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean install -pl geomesa-tutorials-hbase/geomesa-tutorials-hbase-quickstart -am</span><br></pre></td></tr></table></figure>
+<p>建议在构建之前，将mvn的源设置为国内的，可以大幅提高构建速度。另外，如果在构建中遇到了长时间没有响应的情况，可以使用Ctrl+C停止，并再次运行以上命令。</p>
+<p>######2. 运行教程<br>
+构建成功后，在命令行执行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -cp geomesa-tutorials-hbase/geomesa-tutorials-hbase-quickstart/target/geomesa-tutorials-hbase-quickstart-$VERSION.jar \</span><br><span class="line">    org.geomesa.example.hbase.HBaseQuickStart \</span><br><span class="line">    --hbase.zookeepers &lt;zookeepers&gt;           \</span><br><span class="line">    --hbase.catalog &lt;table&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><figcaption><span>```填zookeeper的位置，在单机模式下，这个值为localhost。对于已经将hbase-site.xml设为GeoMesa能够访问的情况（按照第一部分完成安装），则这一项可以不填。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">```--hbase.catalog``` 填HBase表的名称，用于存放测试数据。所填的表要么为空，要么不存在，否则会出错。</span><br><span class="line"></span><br><span class="line">正常情况下，你应该得到如下的结果：</span><br></pre></td></tr></table></figure>
+<p>Loading datastore</p>
+<p>Creating schema: GLOBALEVENTID:String,Actor1Name:String,Actor1CountryCode:String,Actor2Name:String,Actor2CountryCode:String,EventCode:String,NumMentions:Integer,NumSources:Integer,NumArticles:Integer,ActionGeo_Type:Integer,ActionGeo_FullName:String,ActionGeo_CountryCode:String,dtg:Date,geom:Point:srid=4326</p>
+<p>Generating test data</p>
+<p>Writing test data<br>
+Wrote 2356 features</p>
+<p>Running test queries<br>
+Running query BBOX(geom, -120.0,30.0,-75.0,55.0) AND dtg DURING 2017-12-31T00:00:00+00:00/2018-01-02T00:00:00+00:00<br>
+01 719027236=719027236|UNITED STATES|USA|INDUSTRY||012|1|1|1|3|Central Valley, California, United States|US|2018-01-01T00:00:00.000Z|POINT (-119.682 34.0186)<br>
+02 719027005=719027005|UNITED STATES|USA|||172|2|2|2|3|Long Beach, California, United States|US|2018-01-01T00:00:00.000Z|POINT (-118.189 33.767)<br>
+03 719026204=719026204|JUDGE||||0214|6|1|6|3|Los Angeles, California, United States|US|2018-01-01T00:00:00.000Z|POINT (-118.244 34.0522)<br>
+04 719025745=719025745|KING||||051|4|2|4|2|California, United States|US|2018-01-01T00:00:00.000Z|POINT (-119.746 36.17)<br>
+05 719026858=719026858|UNITED STATES|USA|||010|20|2|20|2|California, United States|US|2018-01-01T00:00:00.000Z|POINT (-119.746 36.17)<br>
+06 719026964=719026964|UNITED STATES|USA|||081|2|2|2|2|California, United States|US|2018-01-01T00:00:00.000Z|POINT (-119.746 36.17)<br>
+07 719026965=719026965|CALIFORNIA|USA|||081|8|1|8|2|California, United States|US|2018-01-01T00:00:00.000Z|POINT (-119.746 36.17)<br>
+08 719025635=719025635|PARIS|FRA|||010|2|1|2|3|Las Vegas, Nevada, United States|US|2018-01-01T00:00:00.000Z|POINT (-115.137 36.175)<br>
+09 719026918=719026918|UNITED STATES|USA|||042|20|5|20|3|Las Vegas, Nevada, United States|US|2018-01-01T00:00:00.000Z|POINT (-115.137 36.175)<br>
+10 719027141=719027141|ALABAMA|USA|JUDGE||172|8|1|8|2|Nevada, United States|US|2018-01-01T00:00:00.000Z|POINT (-117.122 38.4199)</p>
+<p>Returned 669 total features</p>
+<p>Running query BBOX(geom, -120.0,30.0,-75.0,55.0) AND dtg DURING 2017-12-31T00:00:00+00:00/2018-01-02T00:00:00+00:00<br>
+Returning attributes [GLOBALEVENTID, dtg, geom]<br>
+01 719027208=719027208|2018-01-01T00:00:00.000Z|POINT (-89.6812 32.7673)<br>
+02 719026313=719026313|2018-01-01T00:00:00.000Z|POINT (-84.388 33.749)<br>
+03 719026419=719026419|2018-01-01T00:00:00.000Z|POINT (-84.388 33.749)<br>
+04 719026316=719026316|2018-01-01T00:00:00.000Z|POINT (-83.6487 32.9866)<br>
+05 719027132=719027132|2018-01-01T00:00:00.000Z|POINT (-81.2793 33.4968)<br>
+06 719026819=719026819|2018-01-01T00:00:00.000Z|POINT (-81.9296 33.7896)<br>
+07 719026952=719026952|2018-01-01T00:00:00.000Z|POINT (-81.9296 33.7896)<br>
+08 719026881=719026881|2018-01-01T00:00:00.000Z|POINT (-82.0193 34.146)<br>
+09 719026909=719026909|2018-01-01T00:00:00.000Z|POINT (-82.0193 34.146)<br>
+10 719026951=719026951|2018-01-01T00:00:00.000Z|POINT (-82.0193 34.146)</p>
+<p>Returned 669 total features</p>
+<p>Running query EventCode = ‘051’<br>
+01 719024909=719024909|||MELBOURNE|AUS|051|10|1|10|4|Melbourne, Victoria, Australia|AS|2018-01-01T00:00:00.000Z|POINT (144.967 -37.8167)<br>
+02 719025178=719025178|AUSTRALIA|AUS|COMMUNITY||051|20|2|20|4|Sydney, New South Wales, Australia|AS|2018-01-01T00:00:00.000Z|POINT (151.217 -33.8833)<br>
+03 719025965=719025965|MIDWIFE||||051|10|1|10|4|Sydney, New South Wales, Australia|AS|2018-01-01T00:00:00.000Z|POINT (151.217 -33.8833)<br>
+04 719025509=719025509|COMMUNITY||AUSTRALIA|AUS|051|2|1|2|1|Australia|AS|2018-01-01T00:00:00.000Z|POINT (135 -25)<br>
+05 719025742=719025742|KING||||051|22|3|22|3|San Diego, California, United States|US|2018-01-01T00:00:00.000Z|POINT (-117.157 32.7153)<br>
+06 719025745=719025745|KING||||051|4|2|4|2|California, United States|US|2018-01-01T00:00:00.000Z|POINT (-119.746 36.17)<br>
+07 719025743=719025743|AUTHORITIES||||051|60|12|60|3|Wichita, Kansas, United States|US|2018-01-01T00:00:00.000Z|POINT (-97.3375 37.6922)<br>
+08 719027205=719027205|UNITED STATES|USA|SIOUX||051|4|1|4|3|Sioux City, Iowa, United States|US|2018-01-01T00:00:00.000Z|POINT (-96.4003 42.5)<br>
+09 719025111=719025111|||UNITED STATES|USA|051|2|1|2|3|Pickens County, South Carolina, United States|US|2018-01-01T00:00:00.000Z|POINT (-82.7165 34.9168)<br>
+10 719026938=719026938|PITTSBURGH|USA|||051|5|1|5|3|York County, Pennsylvania, United States|US|2018-01-01T00:00:00.000Z|POINT (-77 40.1254)</p>
+<p>Returned 138 total features</p>
+<p>Running query EventCode = ‘051’ AND dtg DURING 2017-12-31T00:00:00+00:00/2018-01-02T00:00:00+00:00<br>
+Returning attributes [GLOBALEVENTID, dtg, geom]<br>
+01 719024909=719024909|2018-01-01T00:00:00.000Z|POINT (144.967 -37.8167)<br>
+02 719025178=719025178|2018-01-01T00:00:00.000Z|POINT (151.217 -33.8833)<br>
+03 719025965=719025965|2018-01-01T00:00:00.000Z|POINT (151.217 -33.8833)<br>
+04 719025509=719025509|2018-01-01T00:00:00.000Z|POINT (135 -25)<br>
+05 719025742=719025742|2018-01-01T00:00:00.000Z|POINT (-117.157 32.7153)<br>
+06 719025745=719025745|2018-01-01T00:00:00.000Z|POINT (-119.746 36.17)<br>
+07 719025743=719025743|2018-01-01T00:00:00.000Z|POINT (-97.3375 37.6922)<br>
+08 719027205=719027205|2018-01-01T00:00:00.000Z|POINT (-96.4003 42.5)<br>
+09 719025111=719025111|2018-01-01T00:00:00.000Z|POINT (-82.7165 34.9168)<br>
+10 719026938=719026938|2018-01-01T00:00:00.000Z|POINT (-77 40.1254)</p>
+<p>Returned 138 total features</p>
+<p>Cleaning up test data<br>
+Done</p>
+<pre><code>如果出错，说明GeoMesa没有安装成功，或者是底层的HDFS、HBase出了问题，要根据错误提示具体分析。
+
+从输出结果可以看出，这一实例程序完成了创建schema、写入features、空间查询、属性查询等操作。具体实现可以查看教程中的源代码文件。
+
+######3. 使用Geoserver进行可视化
+- 首先需要按照第一部分的内容，在geoserver中安装GeoMesa的插件。
+然后，进入geoserver后台，依次点击：
+数据存储 =》 添加新的数据存储 =》HBase (GeoMesa) 
+
+- 进入“新建矢量数据源”页面，填写以下项目的内容：
+**数据源名称** —— 随意填写一个有意义的名称，如“geomesa_quick_start”
+**hbase.catalog**—— 存放测试数据的HBase表名称，根据前一步运行的命令填写
+*hbase.zookeepers* —— 可不填，情况和前一步运行的命令时相同，不再赘述
+
+- 最后，点击“保存”，再点击“发布”，即可完成地图服务的发布。
+
+效果展示：
+
+![geoserver效果展示.jpg](https://file.oattao.cn/202112151444091.jpeg)
+
+可点击地图查看数据点的详细信息，也可配置SLD文件，展示更丰富的数据样式，如热力图等。
+
+#### 注意事项
+- 在分布式环境下，一定要确保runtime JAR包被复制到了**每一个节点**，并且**每一个节点**的hbase-site.xml文件都添加了注册协处理器的配置项。
+- 教程中的Geoserver版本是**12.x**，我试过使用更高的版本并修改pom.xml进行重新构建，结果在发布图层时出错。因此不建议使用12.x以外的其他版本的Geoserver。
+- 若在运行教程的程序出现错误时，请先确定HBase的安装是否正确，增删改查功能是否能正常运行。
+
+#### 参考资料
+[官方文档——安装GeoMesa HBase](https://www.geomesa.org/documentation/user/hbase/install.html)
+[官方文档——GeoMesa HBase Quick Start](https://www.geomesa.org/documentation/tutorials/geomesa-quickstart-hbase.html)
+</code></pre>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Yuto Zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zyt4321.github.io/post/27306652.html">https://zyt4321.github.io/post/27306652.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zyt4321.github.io" target="_blank">於桃君的小仓库</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Geomesa/">Geomesa</a><a class="post-meta__tags" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a><a class="post-meta__tags" href="/tags/HBase/">HBase</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.26/img_267_1920x1080_72_null_normal.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/post/63d1671a.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_470_2901x2000_92_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">GeoMesa-从GDELT中写入数据</div></div></a></div><div class="next-post pull-right"><a href="/post/4a6c03a0.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.33/img_333_2560x1440_72_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">完全分布式HBase环境搭建【主要流程记录】</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/post/b58e43fa.html" title="GeoMesa-Java-API-写入与查询数据"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.31/img_318_1913x1124_350_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-23</div><div class="title">GeoMesa-Java-API-写入与查询数据</div></div></a></div><div><a href="/post/63d1671a.html" title="GeoMesa-从GDELT中写入数据"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_470_2901x2000_92_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-04</div><div class="title">GeoMesa-从GDELT中写入数据</div></div></a></div><div><a href="/post/5066df4.html" title="Geomesa-索引"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.80/img_809_480x360_100_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-12</div><div class="title">Geomesa-索引</div></div></a></div><div><a href="/post/4a6c03a0.html" title="完全分布式HBase环境搭建【主要流程记录】"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.33/img_333_2560x1440_72_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-03</div><div class="title">完全分布式HBase环境搭建【主要流程记录】</div></div></a></div><div><a href="/post/389da9b5.html" title="NiFi的分布式安装与启动"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.7/img_70_2133x1200_600_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-19</div><div class="title">NiFi的分布式安装与启动</div></div></a></div><div><a href="/post/ceacc06f.html" title="使用Java-API远程访问HDFS"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.65/img_659_1141x1614_600_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-11-10</div><div class="title">使用Java-API远程访问HDFS</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Yuto Zh</div><div class="author-info__description">个人博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly"><i class="fab fa-github"></i><span>Github</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">欢迎光临~ (=ﾟωﾟ)ﾉ</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/post/c1562469.html" title="语音识别笔记(6)-解码器和WFST"><img src="https://file.oattao.cn/202112010904068.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="语音识别笔记(6)-解码器和WFST"/></a><div class="content"><a class="title" href="/post/c1562469.html" title="语音识别笔记(6)-解码器和WFST">语音识别笔记(6)-解码器和WFST</a><time datetime="2021-12-27T00:40:16.000Z" title="发表于 2021-12-27 08:40:16">2021-12-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/250f40b3.html" title="语音识别笔记(5)-语言模型LM"><img src="https://file.oattao.cn/202112010904068.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="语音识别笔记(5)-语言模型LM"/></a><div class="content"><a class="title" href="/post/250f40b3.html" title="语音识别笔记(5)-语言模型LM">语音识别笔记(5)-语言模型LM</a><time datetime="2021-12-09T02:34:03.000Z" title="发表于 2021-12-09 10:34:03">2021-12-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/30e51682.html" title="语音识别笔记(4)-GMM-HMM模型"><img src="https://file.oattao.cn/202112010904068.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="语音识别笔记(4)-GMM-HMM模型"/></a><div class="content"><a class="title" href="/post/30e51682.html" title="语音识别笔记(4)-GMM-HMM模型">语音识别笔记(4)-GMM-HMM模型</a><time datetime="2021-12-09T02:27:10.000Z" title="发表于 2021-12-09 10:27:10">2021-12-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/3e24ae38.html" title="语音识别笔记(3)-隐马尔可夫模型(HMM)"><img src="https://file.oattao.cn/202112010904068.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="语音识别笔记(3)-隐马尔可夫模型(HMM)"/></a><div class="content"><a class="title" href="/post/3e24ae38.html" title="语音识别笔记(3)-隐马尔可夫模型(HMM)">语音识别笔记(3)-隐马尔可夫模型(HMM)</a><time datetime="2021-12-08T01:17:46.000Z" title="发表于 2021-12-08 09:17:46">2021-12-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/305bae84.html" title="Butterfly主题美化"><img src="https://file.oattao.cn/202112010944275.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Butterfly主题美化"/></a><div class="content"><a class="title" href="/post/305bae84.html" title="Butterfly主题美化">Butterfly主题美化</a><time datetime="2021-11-15T14:17:06.000Z" title="发表于 2021-11-15 22:17:06">2021-11-15</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2018 - 2021 By Yuto Zh</div><div class="footer_custom_text">赣ICP备15011558号</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.css"><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(()=>{
+  const $countDom = document.getElementById('twikoo-count')
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: ''
+    }, null))
+  }
+
+  const getCount = () => {
+    twikoo.getCommentsCount({
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      $countDom.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const loadTwikoo = (bool = false) => {
+    if (typeof twikoo === 'object') {
+      init()
+      bool && $countDom && setTimeout(getCount,0)
+    } else {
+      getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(()=> {
+        init()
+        bool && $countDom && setTimeout(getCount,0)
+      })
+    }
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo(true)
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="/js/user_afterload.js"></script><script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script><link rel="stylesheet" href="/css"><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/about/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
+  window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

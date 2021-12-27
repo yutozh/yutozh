@@ -1,0 +1,399 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>使用Spark-ML进行数据分析 | 於桃君的小仓库</title><meta name="keywords" content="Spark,机器学习,学习笔记"><meta name="author" content="Yuto Zh"><meta name="copyright" content="Yuto Zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Spark版本：2.4.0 语言：Scala 任务：分类 这里对数据的处理步骤如下：  载入数据 归一化 PCA降维 划分训练&#x2F;测试集 线性SVM分类 验证精度 输出cvs格式的结果  前言 从Spark 2.0开始，Spark机器学习API是基于DataFrame的spark.ml。而之前的基于RDD的API spark.mllib已进入维护模式。 也就是说，Spark ML是Spark MLl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Spark-ML进行数据分析">
+<meta property="og:url" content="https://zyt4321.github.io/post/18d340dc.html">
+<meta property="og:site_name" content="於桃君的小仓库">
+<meta property="og:description" content="Spark版本：2.4.0 语言：Scala 任务：分类 这里对数据的处理步骤如下：  载入数据 归一化 PCA降维 划分训练&#x2F;测试集 线性SVM分类 验证精度 输出cvs格式的结果  前言 从Spark 2.0开始，Spark机器学习API是基于DataFrame的spark.ml。而之前的基于RDD的API spark.mllib已进入维护模式。 也就是说，Spark ML是Spark MLl">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.34/img_344_1920x1080_72_null_normal.jpg">
+<meta property="article:published_time" content="2018-12-27T14:05:12.000Z">
+<meta property="article:modified_time" content="2021-12-09T03:06:21.194Z">
+<meta property="article:author" content="Yuto Zh">
+<meta property="article:tag" content="Spark">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.34/img_344_1920x1080_72_null_normal.jpg"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://zyt4321.github.io/post/18d340dc"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.js" defer></script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?526cd666012561974990381acfd5535e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"PG8YF6H1J2","apiKey":"ce412ecd71d1ba81bbd6d11fb1685148","indexName":"butterfly-blog","hits":{"per_page":"6s"},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Yuto Zh","link":"链接: ","source":"来源: 於桃君的小仓库","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '使用Spark-ML进行数据分析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-12-09 11:06:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    document.addEventListener('pjax:complete', detectApple)})(window)</script><link rel="stylesheet" href="/css/beauty.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yutozh/CDN@2.0/fontawesome-pro-master/css/all.min.css"><meta name="generator" content="Hexo 5.4.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">於桃君的小仓库</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">使用Spark-ML进行数据分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2018-12-27T14:05:12.000Z" title="发表于 2018-12-27 22:05:12">2018-12-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-09T03:06:21.194Z" title="更新于 2021-12-09 11:06:21">2021-12-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/AI/">AI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>10分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="使用Spark-ML进行数据分析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>Spark版本：2.4.0<br>
+语言：Scala<br>
+任务：分类</p>
+<p>这里对数据的处理步骤如下：</p>
+<ol>
+<li>载入数据</li>
+<li>归一化</li>
+<li>PCA降维</li>
+<li>划分训练/测试集</li>
+<li>线性SVM分类</li>
+<li>验证精度</li>
+<li>输出cvs格式的结果</li>
+</ol>
+<h1>前言</h1>
+<p>从Spark 2.0开始，<a target="_blank" rel="noopener" href="http://xn--SparkAPIDataFramespark-7k88aw5au94l0siw5x662eblgn87j.ml">Spark机器学习API是基于DataFrame的spark.ml</a>。而之前的基于RDD的API spark.mllib已进入维护模式。<br>
+也就是说，Spark ML是Spark MLlib的一种新的API，它主要有以下几个优点：</p>
+<ul>
+<li>面向DataFrame，在RDD基础上进一步封装，提供更强大更方便的API</li>
+<li>Pipeline功能，便于实现复杂的机器学习模型</li>
+<li>性能提升</li>
+</ul>
+<p>基于Pipeline的Spark ML中的几个概念：</p>
+<ul>
+<li>DataFrame：从Spark SQL 的引用的概念，表示一个数据集，它可以容纳多种数据类型。例如可以存储文本，特征向量，标签和预测值等</li>
+<li>Transformer：是可以将一个DataFrame变换成另一个DataFrame的算法。例如，一个训练好的模型是一个Transformer，通过transform方法，将原始DataFrame转化为一个包含预测值的DataFrame</li>
+<li>Estimator：是一个算法，接受一个DataFrame，产生一个Transformer。例如，一个学习算法（如PCA,SVM）是一个Estimator，通过fit方法，训练DataFrame并产生模型Transformer</li>
+<li>Pipeline： Pipeline将多个Transformers和Estimators连接起来组合成一个机器学习工作流程</li>
+<li>Parameter：用于对Transformers和Estimators指定参数的统一接口</li>
+</ul>
+<p>本次实验使用的是Spark ML的API</p>
+<p>首先要创建SparkSession</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建SparkSession</span></span><br><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">  .builder</span><br><span class="line">  .appName(<span class="string">&quot;LinearSVCExample&quot;</span>)</span><br><span class="line">  .master(<span class="string">&quot;local&quot;</span>)</span><br><span class="line">  .getOrCreate()</span><br></pre></td></tr></table></figure>
+<h1>数据处理步骤</h1>
+<h2 id="1-载入数据">1 载入数据</h2>
+<p>数据载入的方式有多种，这里使用libsvm格式的数据作为数据源，libsvm格式常被用来存储稀疏的矩阵数据，它每一行的格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">label index1:value1 index2:value2 ...</span><br></pre></td></tr></table></figure>
+<p>第一个值是标签，后面是由“列号:值”组成键值对，只需要记录非0项即可。</p>
+<p>数据加载使用load方法完成：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载训练数据，生成DataFrame</span></span><br><span class="line"><span class="keyword">val</span> data = spark.read.format(<span class="string">&quot;libsvm&quot;</span>).load(<span class="string">&quot;data/sample_libsvm_data.txt&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="2-归一化">2 归一化</h2>
+<p>作为数据预处理的第一步，需要对原始数据做归一化处理，即把原始数据的每一维减去其平均值，再除以其标准差，使得数据总体分布为以0为中心，且标准差为1。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 归一化</span></span><br><span class="line"><span class="keyword">val</span> scaler = <span class="keyword">new</span> <span class="type">StandardScaler</span>()</span><br><span class="line">   .setInputCol(<span class="string">&quot;features&quot;</span>)</span><br><span class="line">   .setOutputCol(<span class="string">&quot;scaledFeatures&quot;</span>)</span><br><span class="line">   .setWithMean(<span class="literal">true</span>)</span><br><span class="line">   .setWithStd(<span class="literal">true</span>)</span><br><span class="line">   .fit(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> scaleddata = scaler.transform(data).select(<span class="string">&quot;label&quot;</span>, <span class="string">&quot;scaledFeatures&quot;</span>).toDF(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;features&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="3-PCA降维">3 PCA降维</h2>
+<p>有时数据的维数可能很大，直接进行分类不仅计算量很大，而且对数据量的要求也很高，常常会出现过拟合。因此需要进行降维，常用的是主成分分析(PCA)算法。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建PCA模型，生成Transformer</span></span><br><span class="line"><span class="keyword">val</span> pca = <span class="keyword">new</span> <span class="type">PCA</span>()</span><br><span class="line">  .setInputCol(<span class="string">&quot;features&quot;</span>)</span><br><span class="line">  .setOutputCol(<span class="string">&quot;pcaFeatures&quot;</span>)</span><br><span class="line">  .setK(<span class="number">5</span>)</span><br><span class="line">  .fit(scaleddata)</span><br><span class="line"></span><br><span class="line"><span class="comment">//  transform数据，生成主成分特征</span></span><br><span class="line"><span class="keyword">val</span> pcaResult = pca.transform(scaleddata).select(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;pcaFeatures&quot;</span>).toDF(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;features&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="4-划分训练-测试集">4 划分训练/测试集</h2>
+<p>经过降维的数据就可以拿来训练分类器了，但是在此之前要将数据划分为训练集和测试集，分类器只能在训练集上进行训练，在测试集上验证其分类精度。Spark提供了很方便的接口，按给定的比例随机划分训练/测试集。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将经过主成分分析的数据，按比例划分为训练数据和测试数据</span></span><br><span class="line"><span class="keyword">val</span> <span class="type">Array</span>(trainingData, testData) = pcaResult.randomSplit(<span class="type">Array</span>(<span class="number">0.7</span>, <span class="number">0.3</span>), seed = <span class="number">20</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="5-线性SVM分类">5 线性SVM分类</h2>
+<p>这一步构建线性SVM模型，设置最大迭代次数和正则化项的系数，使用训练集进行训练。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建SVC分类器(Estimator)</span></span><br><span class="line"><span class="keyword">val</span> lsvc = <span class="keyword">new</span> <span class="type">LinearSVC</span>()</span><br><span class="line">  .setMaxIter(<span class="number">10</span>)</span><br><span class="line">  .setRegParam(<span class="number">0.1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 训练分类器，生成模型(Transformer)</span></span><br><span class="line"><span class="keyword">val</span> lsvcModel = lsvc.fit(trainingData)</span><br></pre></td></tr></table></figure>
+<h2 id="6-验证精度">6 验证精度</h2>
+<p>将训练好的分类器作用于测试集上，获得分类结果。</p>
+<p>分类结果的好坏有很多种衡量的方法，如查准率、查全率等，这里我们使用最简单的一种衡量标准——精度，即正确分类的样本数占总样本数的比值。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用训练好的模型，验证测试数据</span></span><br><span class="line"><span class="keyword">val</span> res = lsvcModel.transform(testData).select(<span class="string">&quot;prediction&quot;</span>,<span class="string">&quot;label&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算精度</span></span><br><span class="line"><span class="keyword">val</span> evaluator = <span class="keyword">new</span> <span class="type">MulticlassClassificationEvaluator</span>()</span><br><span class="line">  .setLabelCol(<span class="string">&quot;label&quot;</span>)</span><br><span class="line">  .setPredictionCol(<span class="string">&quot;prediction&quot;</span>)</span><br><span class="line">  .setMetricName(<span class="string">&quot;accuracy&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> accuracy = evaluator.evaluate(res)</span><br><span class="line"></span><br><span class="line">println(<span class="string">s&quot;Accuracy = <span class="subst">$&#123;accuracy&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="7-输出cvs格式的结果">7 输出cvs格式的结果</h2>
+<p>Spark的DataFrame类型支持导出多种格式，这里以常用的csv格式为例。</p>
+<p>这里输出的目的是为了使用Python进行可视化，在降维后进行，可以直观的看出降维后的数据是否明显可分。</p>
+<p>使用VectorAssembler，将标签与特征合并为一列，再进行输出。</p>
+<p><strong>（这里是将合并后的列转换为String再输出的，因此输出的csv文件是带有引号和括号的，至于为什么要这样输出，请看第二部分）</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将标签与主成分合成为一列</span></span><br><span class="line"><span class="keyword">val</span> assembler = <span class="keyword">new</span> <span class="type">VectorAssembler</span>()</span><br><span class="line">  .setInputCols(<span class="type">Array</span>(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;features&quot;</span>))</span><br><span class="line">  .setOutputCol(<span class="string">&quot;assemble&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> output = assembler.transform(pcaResult)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出csv格式的标签和主成分，便于可视化</span></span><br><span class="line"><span class="keyword">val</span> ass = output.select(output(<span class="string">&quot;assemble&quot;</span>).cast(<span class="string">&quot;string&quot;</span>))</span><br><span class="line">ass.write.mode(<span class="string">&quot;overwrite&quot;</span>).csv(<span class="string">&quot;output.csv&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>当然也可以用同样的方法输出训练/预测的结果，这里就不再详细介绍。</p>
+<h1>遇到的问题</h1>
+<p>完成这个简单的分类实验，花了我两天多的时间，从配置环境到熟悉API，再到遇见各种奇怪的问题……这里我都把他们记录下来，供以后参考。</p>
+<h2 id="1-配置环境">1 配置环境</h2>
+<p>起初，我想通过在本机编写代码，然后访问安装在虚拟机中的Spark节点（单节点）这种方式进行实验的（不是提交jar包然后执行spark-submit），也就在是创建SparkSession时，指定虚拟机中的Spark：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">  .builder</span><br><span class="line">  .appName(<span class="string">&quot;LinearSVCExample&quot;</span>)</span><br><span class="line">  .master(<span class="string">&quot;spark://192.168.1.128:7077&quot;</span>) <span class="comment">// 虚拟机IP</span></span><br><span class="line">  .getOrCreate()</span><br></pre></td></tr></table></figure>
+<p>然而，这样并没有成功。遇到的问题有：</p>
+<ul>
+<li>拒绝连接</li>
+<li>Spark的worker里可以查看到提交的任务，但是一直处于等待状态，没有响应。并且提示：<br>
+<code>WARN TaskSchedulerImpl: Initial job has not accepted any resources; check your cluster UI to ensure that workers are registered and have sufficient resources</code>（实际上，内存和CPU是够的）</li>
+<li>报错<code>RuntimeException: java.io.EOFException......</code></li>
+</ul>
+<p>在尝试过各种方案都没有解决问题之后，我放弃了，最后还是在本机中安装Spark，在local模式下运行。（<strong>如果有同学成功实现上面的访问方法，欢迎留言告诉我~</strong>）</p>
+<p>至于如何在本机（Windows）安装Spark，百度搜索即可</p>
+<h2 id="2-导出CSV格式的数据">2 导出CSV格式的数据</h2>
+<p>将DataFrame导出为cvs格式的时候，遇到了这个问题：<br>
+<code>java.lang.UnsupportedOperationException: CSV data source does not support struct&lt;type:tinyint,size:int,indices:array&lt;int&gt;,values:array&lt;double&gt;&gt; data type.</code></p>
+<p>而我要导出的DataFrame只是一个多行数组而已啊：</p>
+<p><img src="https://file.oattao.cn/202112091100703.png" alt="image.png"></p>
+<p>根据<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/44160768/spark-2-1-cannot-write-vector-field-on-csv#">StackOverflow上面的提问</a>，Spark的csv导出不支持复杂结构，array<double>都不行。</p>
+<p>然后有人给了一种<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/40426106/spark-2-0-x-dump-a-csv-file-from-a-dataframe-containing-one-array-of-type-string%20%22here%22%20on%20Stackoverflow">办法</a>，把数组转化为String，就可以导出了。</p>
+<p>但是导出的结果是这样的：</p>
+<p><img src="https://file.oattao.cn/202112091100008.png" alt="image.png"></p>
+<p>需要进一步处理。</p>
+<p>所以还不如手动实现导出csv文件，<strong>或者你有更好的办法，欢迎留言告诉我，非常感谢~</strong></p>
+<h2 id="3-PCA维数限制">3 PCA维数限制</h2>
+<p>当我想跑一个10万维度的数据时，程序运行到PCA报错：<br>
+<code>java.lang.IllegalArgumentException: Argument with more than 65535 cols: 109600</code></p>
+<p>原来，Spark ML的PCA不支持超过65535维的数据。<a target="_blank" rel="noopener" href="https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/linalg/distributed/RowMatrix.scala#L202">参见源码</a></p>
+<h2 id="4-SVM核">4 SVM核</h2>
+<p>翻阅了<a target="_blank" rel="noopener" href="https://spark.apache.org/docs/latest/ml-classification-regression.html">Spark ML文档</a>，只找到Linear Support Vector Machine，即线性核的支持向量机。对于高斯核和其他非线性的核，Spark ML貌似还没有实现。</p>
+<p><img src="https://file.oattao.cn/202112091100924.png" alt="image.png"></p>
+<h2 id="5-withColumn操作">5 withColumn操作</h2>
+<p>起初我认为对数据进行降维前，需要把DataFrame中的标签label与特征feature分开，然后对feature进行降维，再使用withColumn方法，把label与降维后的feature组合成新的DataFrame。</p>
+<p>发现这样既不可行也没有必要。</p>
+<p>首先，withColumn只能添加当前DataFrame的数据（对DataFrame某一列进行一些操作，再添加到这个DataFrame本身），不能把来自于不同DataFrame的Column添加到当前DataFrame中。</p>
+<p>其次，PCA降维时，只需指定InputCoulum作为特征列，指定OutputColumn作为输出列，其他列的存在并不影响PCA的执行，PCA也不会改变它们，在新生成的DataFrame中依然会保留原来所有Column，并且添加上降维后的数据Column，后面再使用select方法选择出所需的Column即可。</p>
+<h1>完整代码（Pipeline版）</h1>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.log4j.&#123;<span class="type">Level</span>, <span class="type">Logger</span>&#125;</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.ml.<span class="type">Pipeline</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.ml.feature._</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.ml.evaluation.&#123;<span class="type">BinaryClassificationEvaluator</span>, <span class="type">MulticlassClassificationEvaluator</span>&#125;</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.ml.feature.<span class="type">PCA</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.ml.classification.<span class="type">LinearSVC</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) &#123;</span><br><span class="line">    <span class="type">System</span>.setProperty(<span class="string">&quot;hadoop.home.dir&quot;</span>, <span class="string">&quot;D:\\hadoop-2.8.3&quot;</span>)</span><br><span class="line">    <span class="comment">//  屏蔽日志</span></span><br><span class="line">    <span class="type">Logger</span>.getLogger(<span class="string">&quot;org.apache.spark&quot;</span>).setLevel(<span class="type">Level</span>.<span class="type">WARN</span>)</span><br><span class="line">    <span class="type">Logger</span>.getLogger(<span class="string">&quot;org.eclipse.jetty.server&quot;</span>).setLevel(<span class="type">Level</span>.<span class="type">OFF</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建sparkSession</span></span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">      .builder</span><br><span class="line">      .appName(<span class="string">&quot;LinearSVCExample&quot;</span>)</span><br><span class="line">      .master(<span class="string">&quot;local&quot;</span>)</span><br><span class="line">      .getOrCreate()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载训练数据，生成DataFrame</span></span><br><span class="line">    <span class="keyword">val</span> data = spark.read.format(<span class="string">&quot;libsvm&quot;</span>).load(<span class="string">&quot;data/sample_libsvm_data.txt&quot;</span>)</span><br><span class="line"></span><br><span class="line">    println(data.count())</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 归一化</span></span><br><span class="line">    <span class="keyword">val</span> scaler = <span class="keyword">new</span> <span class="type">StandardScaler</span>()</span><br><span class="line">      .setInputCol(<span class="string">&quot;features&quot;</span>)</span><br><span class="line">      .setOutputCol(<span class="string">&quot;scaledFeatures&quot;</span>)</span><br><span class="line">      .setWithMean(<span class="literal">true</span>)</span><br><span class="line">      .setWithStd(<span class="literal">true</span>)</span><br><span class="line">      .fit(data)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> scaleddata = scaler.transform(data).select(<span class="string">&quot;label&quot;</span>, <span class="string">&quot;scaledFeatures&quot;</span>).toDF(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;features&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建PCA模型，生成Transformer</span></span><br><span class="line">    <span class="keyword">val</span> pca = <span class="keyword">new</span> <span class="type">PCA</span>()</span><br><span class="line">      .setInputCol(<span class="string">&quot;features&quot;</span>)</span><br><span class="line">      .setOutputCol(<span class="string">&quot;pcaFeatures&quot;</span>)</span><br><span class="line">      .setK(<span class="number">5</span>)</span><br><span class="line">      .fit(scaleddata)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//  transform 数据，生成主成分特征</span></span><br><span class="line">    <span class="keyword">val</span> pcaResult = pca.transform(scaleddata).select(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;pcaFeatures&quot;</span>).toDF(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;features&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//  pcaResult.show(truncate=false)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将标签与主成分合成为一列</span></span><br><span class="line">    <span class="keyword">val</span> assembler = <span class="keyword">new</span> <span class="type">VectorAssembler</span>()</span><br><span class="line">      .setInputCols(<span class="type">Array</span>(<span class="string">&quot;label&quot;</span>,<span class="string">&quot;features&quot;</span>))</span><br><span class="line">      .setOutputCol(<span class="string">&quot;assemble&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> output = assembler.transform(pcaResult)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出csv格式的标签和主成分，便于可视化</span></span><br><span class="line">    <span class="keyword">val</span> ass = output.select(output(<span class="string">&quot;assemble&quot;</span>).cast(<span class="string">&quot;string&quot;</span>))</span><br><span class="line">    ass.write.mode(<span class="string">&quot;overwrite&quot;</span>).csv(<span class="string">&quot;output.csv&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将经过主成分分析的数据，按比例划分为训练数据和测试数据</span></span><br><span class="line">    <span class="keyword">val</span> <span class="type">Array</span>(trainingData, testData) = pcaResult.randomSplit(<span class="type">Array</span>(<span class="number">0.7</span>, <span class="number">0.3</span>), seed = <span class="number">20</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建SVC分类器(Estimator)</span></span><br><span class="line">    <span class="keyword">val</span> lsvc = <span class="keyword">new</span> <span class="type">LinearSVC</span>()</span><br><span class="line">      .setMaxIter(<span class="number">10</span>)</span><br><span class="line">      .setRegParam(<span class="number">0.1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建pipeline, 将上述步骤连接起来</span></span><br><span class="line">    <span class="keyword">val</span> pipeline = <span class="keyword">new</span> <span class="type">Pipeline</span>()</span><br><span class="line">      .setStages(<span class="type">Array</span>(scaler, pca, lsvc))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用串联好的模型在训练集上训练</span></span><br><span class="line">    <span class="keyword">val</span> model = pipeline.fit(trainingData)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 在测试集上测试</span></span><br><span class="line">    <span class="keyword">val</span> predictions = model.transform(testData).select(<span class="string">&quot;prediction&quot;</span>,<span class="string">&quot;label&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算精度</span></span><br><span class="line">    <span class="keyword">val</span> evaluator = <span class="keyword">new</span> <span class="type">MulticlassClassificationEvaluator</span>()</span><br><span class="line">      .setLabelCol(<span class="string">&quot;label&quot;</span>)</span><br><span class="line">      .setPredictionCol(<span class="string">&quot;prediction&quot;</span>)</span><br><span class="line">      .setMetricName(<span class="string">&quot;accuracy&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> accuracy = evaluator.evaluate(predictions)</span><br><span class="line"></span><br><span class="line">    println(<span class="string">s&quot;Accuracy = <span class="subst">$&#123;accuracy&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">    spark.stop()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>最后的精度为1.0，这里使用的测试数据比较好分，从PCA后对前两维的可视化结果可以看出：</p>
+<p><img src="https://file.oattao.cn/202112091100535.png" alt="image.png"></p>
+<h3 id="参考资料">参考资料</h3>
+<p><a target="_blank" rel="noopener" href="https://spark.apache.org/docs/latest/ml-classification-regression.html">Spark ML文档</a><br>
+<a target="_blank" rel="noopener" href="http://www.mamicode.com/info-detail-1860297.html">DataFrame API</a><br>
+<a target="_blank" rel="noopener" href="https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/linalg/distributed/RowMatrix.scala#L202">PCA列数限制-源码</a><br>
+<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/40426106/spark-2-0-x-dump-a-csv-file-from-a-dataframe-containing-one-array-of-type-string%20%22here%22%20on%20Stackoverflow">导出cvs文件方法-stackoverflow</a><br>
+<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/44160768/spark-2-1-cannot-write-vector-field-on-csv#">无法导出csv文件-stackoverflow</a><br>
+<a target="_blank" rel="noopener" href="https://github.com/apache/spark/blob/master/data/mllib/sample_libsvm_data.txt">示例数据</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Yuto Zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zyt4321.github.io/post/18d340dc.html">https://zyt4321.github.io/post/18d340dc.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zyt4321.github.io" target="_blank">於桃君的小仓库</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Spark/">Spark</a><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.34/img_344_1920x1080_72_null_normal.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/post/ca28ae8b.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.64/img_641_1006x706_96_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">机器学习中的常用评价指标汇总</div></div></a></div><div class="next-post pull-right"><a href="/post/a68baeee.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.84/img_849_1889x1336_96_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">使用NiFi将数据从Mysql导入至HBase</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/post/e1ca212c.html" title="使用python-matplotlib绘制混淆矩阵"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.27/img_279_1920x1080_350_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-04-16</div><div class="title">使用python-matplotlib绘制混淆矩阵</div></div></a></div><div><a href="/post/ca28ae8b.html" title="机器学习中的常用评价指标汇总"><img class="cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.64/img_641_1006x706_96_null_normal.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-25</div><div class="title">机器学习中的常用评价指标汇总</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">数据处理步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%BD%BD%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="toc-number">2.1.</span> <span class="toc-text">1 载入数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%BD%92%E4%B8%80%E5%8C%96"><span class="toc-number">2.2.</span> <span class="toc-text">2 归一化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-PCA%E9%99%8D%E7%BB%B4"><span class="toc-number">2.3.</span> <span class="toc-text">3 PCA降维</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%88%92%E5%88%86%E8%AE%AD%E7%BB%83-%E6%B5%8B%E8%AF%95%E9%9B%86"><span class="toc-number">2.4.</span> <span class="toc-text">4 划分训练&#x2F;测试集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BA%BF%E6%80%A7SVM%E5%88%86%E7%B1%BB"><span class="toc-number">2.5.</span> <span class="toc-text">5 线性SVM分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E9%AA%8C%E8%AF%81%E7%B2%BE%E5%BA%A6"><span class="toc-number">2.6.</span> <span class="toc-text">6 验证精度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E8%BE%93%E5%87%BAcvs%E6%A0%BC%E5%BC%8F%E7%9A%84%E7%BB%93%E6%9E%9C"><span class="toc-number">2.7.</span> <span class="toc-text">7 输出cvs格式的结果</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">遇到的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83"><span class="toc-number">3.1.</span> <span class="toc-text">1 配置环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-number">3.2.</span> <span class="toc-text">2 导出CSV格式的数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-PCA%E7%BB%B4%E6%95%B0%E9%99%90%E5%88%B6"><span class="toc-number">3.3.</span> <span class="toc-text">3 PCA维数限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-SVM%E6%A0%B8"><span class="toc-number">3.4.</span> <span class="toc-text">4 SVM核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-withColumn%E6%93%8D%E4%BD%9C"><span class="toc-number">3.5.</span> <span class="toc-text">5 withColumn操作</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">完整代码（Pipeline版）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">4.0.1.</span> <span class="toc-text">参考资料</span></a></li></ol></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2018 - 2021 By Yuto Zh</div><div class="footer_custom_text">赣ICP备15011558号</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.css"><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(()=>{
+  const $countDom = document.getElementById('twikoo-count')
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: ''
+    }, null))
+  }
+
+  const getCount = () => {
+    twikoo.getCommentsCount({
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      $countDom.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const loadTwikoo = (bool = false) => {
+    if (typeof twikoo === 'object') {
+      init()
+      bool && $countDom && setTimeout(getCount,0)
+    } else {
+      getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(()=> {
+        init()
+        bool && $countDom && setTimeout(getCount,0)
+      })
+    }
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo(true)
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="/js/user_afterload.js"></script><script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script><link rel="stylesheet" href="/css"><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/about/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
+  window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

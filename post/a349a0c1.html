@@ -1,0 +1,456 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WebGIS中的坐标系和瓦片地图 | 於桃君的小仓库</title><meta name="keywords" content="学习笔记,WebGIS,瓦片地图,坐标系"><meta name="author" content="Yuto Zh"><meta name="copyright" content="Yuto Zh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文主要介绍坐标系和瓦片地图的相关知识， 他们是进行WebGIS开发的基础。 1 坐标系 坐标系分为地理坐标系和投影坐标系，他们的定义如下： 地理坐标系（Geographic Coordinate System）：     是使用三维球面来定义地球表面位置，以实现通过经纬度对地球表面点位引用的坐标系。包括角度测量单位、本初子午线和参考椭球体三部分。 投影坐标系（Projection Coordin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebGIS中的坐标系和瓦片地图">
+<meta property="og:url" content="https://zyt4321.github.io/post/a349a0c1.html">
+<meta property="og:site_name" content="於桃君的小仓库">
+<meta property="og:description" content="本文主要介绍坐标系和瓦片地图的相关知识， 他们是进行WebGIS开发的基础。 1 坐标系 坐标系分为地理坐标系和投影坐标系，他们的定义如下： 地理坐标系（Geographic Coordinate System）：     是使用三维球面来定义地球表面位置，以实现通过经纬度对地球表面点位引用的坐标系。包括角度测量单位、本初子午线和参考椭球体三部分。 投影坐标系（Projection Coordin">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_474_1920x1080_96_null_normal.jpg">
+<meta property="article:published_time" content="2018-10-01T09:45:52.000Z">
+<meta property="article:modified_time" content="2021-12-15T06:52:11.672Z">
+<meta property="article:author" content="Yuto Zh">
+<meta property="article:tag" content="GIS">
+<meta property="article:tag" content="WebGIS">
+<meta property="article:tag" content="坐标系">
+<meta property="article:tag" content="瓦片地图">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_474_1920x1080_96_null_normal.jpg"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://zyt4321.github.io/post/a349a0c1"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.js" defer></script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?526cd666012561974990381acfd5535e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"PG8YF6H1J2","apiKey":"ce412ecd71d1ba81bbd6d11fb1685148","indexName":"butterfly-blog","hits":{"per_page":"6s"},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Yuto Zh","link":"链接: ","source":"来源: 於桃君的小仓库","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'WebGIS中的坐标系和瓦片地图',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-12-15 14:52:11'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    document.addEventListener('pjax:complete', detectApple)})(window)</script><link rel="stylesheet" href="/css/beauty.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yutozh/CDN@2.0/fontawesome-pro-master/css/all.min.css"><meta name="generator" content="Hexo 5.4.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">於桃君的小仓库</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fad fa-home-alt color-pink"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-file-alt color-green"></i><span> 文章</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fad fa-bars color-green"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags color-grey"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive color-blue"></i><span> 时间轴</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat color-blue"></i><span> 收藏</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 相册</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link color-purple"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fad fa-comment-alt-smile color-yellow"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fad fa-meh color-orange"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">WebGIS中的坐标系和瓦片地图</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2018-10-01T09:45:52.000Z" title="发表于 2018-10-01 17:45:52">2018-10-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-15T06:52:11.672Z" title="更新于 2021-12-15 14:52:11">2021-12-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/GIS/">GIS</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>9分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="WebGIS中的坐标系和瓦片地图"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>本文主要介绍坐标系和瓦片地图的相关知识， 他们是进行WebGIS开发的基础。</p>
+<h1>1 坐标系</h1>
+<p>坐标系分为地理坐标系和投影坐标系，他们的定义如下：<br>
+<strong>地理坐标系</strong>（Geographic Coordinate System）：<br>
+    是使用三维球面来定义地球表面位置，以实现通过经纬度对地球表面点位引用的坐标系。包括角度测量单位、本初子午线和参考椭球体三部分。</p>
+<p><strong>投影坐标系</strong>（Projection Coordinate System）：<br>
+    是使用基于X,Y值的坐标系统来描述地球上某个点所处的位置。它由地理坐标系和投影方法两个要素所决定。</p>
+<h2 id="1-1-地理坐标系">1.1 地理坐标系</h2>
+<h4 id="旋转椭球体">旋转椭球体</h4>
+<p>    地球表面是崎岖不平的，人们为了精确表示地球表面的位置，引入了<strong>旋转椭球体</strong>的概念。即用一个规则的旋转椭球体去逼近真实的地球表面。一个旋转椭球体的参数主要有以下三个:长半轴、短半轴、扁率。定义了这三个参数，也就唯一确定了一个旋转椭球体。<br>
+<img src="https://file.oattao.cn/202112151450105.png" alt="旋转椭球体"></p>
+<h4 id="大地基准面">大地基准面</h4>
+<p>    定义了椭球体的形状后，还需要确定椭球体的位置。椭球体表面与真实地球表面存在差异，并且在世界的不同地区，这种差异也不尽相同。因此椭球体的定位直接决定了地理坐标与真实位置的误差。椭球体定位就是需要确定<strong>大地基准面</strong>，从而确定椭球体与地球的相对位置。有以下两类大地基准面：</p>
+<ul>
+<li>地心基准面：由卫星数据得到，使用地球的质心作为原点，如如CGCS2000、WGS84。</li>
+<li>区域基准面：特定区域内与地球表面吻合，旋转椭球体表面上的点与地球表面上的特定位置相匹配，但椭球的中心不与地球质心重合而是接近地球质心。例如Beijing54、Xian80。</li>
+</ul>
+<p>    确定了旋转椭球体的<strong>形状</strong>和<strong>位置</strong>，那么地理坐标系的基础就确定了。接下来需要定义地球上任意一点的地理坐标表示方法。</p>
+<h4 id="地理坐标">地理坐标</h4>
+<p>    地理坐标，就是用经纬度表示地面点位的球面坐标。在大地测量学中，对于地理坐标系统中的经纬度有三种提法：天文经纬度、大地经纬度和地心经纬度。其中使用较多的是大地经纬度，其使用大地坐标（L,B,h）表示地面点在椭球面上的位置三个要素，他们的定义如下：</p>
+<ul>
+<li>大地经度L：参考椭球面上某点的大地子午面与本初子午面间的二面角</li>
+<li>大地纬度B：为参考椭球面上某点的法线与赤道平面的夹角，北纬为正，南纬为负</li>
+<li>大地高h：从观测点沿椭球法线方向到椭球面的距离</li>
+</ul>
+<p>图示：<br>
+<img src="https://file.oattao.cn/202112151450630.jpeg" alt="大地坐标.jpg"></p>
+<p>    这样就完成了地理坐标系的定义，地球上任意一点都能获得经纬度坐标了。</p>
+<h2 id="1-2-投影坐标系">1.2 投影坐标系</h2>
+<p>    在椭球面上表示的地球上物体的坐标，会给实际使用带来一些麻烦。更多的时候我们希望将地物展现在平面上，这时就需要引入投影坐标系的概念。</p>
+<h4 id="地图投影">地图投影</h4>
+<p>    在地球椭球面和平面之间建立点与点之间函数关系的数学方法，称为<strong>地图投影</strong>。<br>
+    地图投影的一般公式为：x = F(λ，φ), y = G(λ，φ)<br>
+    确定了投影方法后，也就确定了函数F和G，只要知道地面点的经纬度（λ，φ），便可以在投影平面上找到相对应的平面位置（x，y）。</p>
+<p>投影方法有以下几类：</p>
+<ul>
+<li>按变形性质分类：
+<ul>
+<li>等角投影：角度变形为零（Mercator）</li>
+<li>等积投影：面积变形为零（Albers）</li>
+<li>任意投影：长度、角度和面积都存在变形</li>
+</ul>
+</li>
+<li>按投影面类型划分：
+<ul>
+<li>圆柱投影：投影面为圆柱</li>
+<li>圆锥投影：投影面为圆锥</li>
+<li>方位投影：投影面为平面</li>
+</ul>
+</li>
+<li>按投影面与地球位置关系划分为：
+<ul>
+<li>正轴投影：投影面中心轴与地轴相互重合</li>
+<li>斜轴投影：投影面中心轴与地轴斜向相交</li>
+<li>横轴投影：投影面中心轴与地轴相互垂直</li>
+<li>相切投影：投影面与椭球体相切</li>
+<li>相割投影：投影面与椭球体相割</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://file.oattao.cn/202112151450365.jpeg" alt="投影"></p>
+<h4 id="常用的投影方法">常用的投影方法</h4>
+<ul>
+<li>
+<p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/UTM%E6%8A%95%E5%BD%B1">UTM投影</a><br>
+    UTM投影全称为&quot;通用横轴墨卡托投影&quot;，是一种&quot;等角横轴割圆柱投影&quot;，椭圆柱割地球于南纬80度、北纬84度两条等高圈，投影后两条相割的经线上没有变形，而中央经线上长度比0.9996。</p>
+</li>
+<li>
+<p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E9%AB%98%E6%96%AF-%E5%85%8B%E5%90%95%E6%A0%BC%E6%8A%95%E5%BD%B1">高斯—克吕格投影</a>（Gauss-Kruger）<br>
+    高斯-克吕格投影，是一种“横轴等角切圆柱投影”，中央经线没有变形，不在中央经线上的点，长度比均大于1。且离开中央经线越远，长度变形越大。</p>
+</li>
+</ul>
+<p>    以上两种方法都要进行分带投影。即按一定的间隔选取经线作为投影的中央经线，中央经线两侧一定范围内的地区按所选中央经线进行投影。这样做的目的是减小投影变形，方便在工程中使用。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%A2%A8%E5%8D%A1%E6%89%98%E6%8A%95%E5%BD%B1">墨卡托投影</a>（Mercator Projection）<br>
+    墨卡托投影，是一种“正轴等角圆柱投影”，假想一个与地轴方向一致的圆柱切或割于地球，按等角条件，将经纬网投影到圆柱面上，将圆柱面展为平面后，即得本投影。该投影具有等角航线被表示成直线的特性，故广泛用于编制航海图和航空图等。其缺点是在两极的变形严重。</li>
+</ul>
+<p><em><strong>具体的投影方法请点击小标题查看。</strong></em></p>
+<p>    选择一个地理坐标系，以及一个地图投影方法，就唯一确定了一个投影坐标系，从而可以使用平面坐标表示地球上物体的位置了。</p>
+<h2 id="1-3-WebGIS中常用的坐标系">1.3 WebGIS中常用的坐标系</h2>
+<p>    在Web地图领域，使用最为广泛的坐标系统就是<strong>WGS84 Web Mercator</strong>。谷歌地图、Virtual Earth、Bing Maps、百度地图、Mapabc、ArcGIS Online等都是采用这种坐标系。作为一个投影坐标系，需要两个基本的要素，一个是地理坐标系，还有一个是投影方法。我们分别来看：</p>
+<h4 id="WGS84-Web-Mercator的地理坐标系">WGS84 Web Mercator的地理坐标系</h4>
+<p>    从名字可以看出，WGS84 Web Mercator坐标系采用的地理坐标系是WGS84坐标系，它属于地心坐标系，坐标系的原点位于地球质心，其基本参数如下：</p>
+<blockquote>
+<p>GCS_WGS_1984<br>
+WKID: 4326 Authority: EPSG<br>
+Angular Unit: Degree (0.0174532925199433)<br>
+Prime Meridian: Greenwich (0.0)<br>
+Datum: D_WGS_1984<br>
+Spheroid: WGS_1984<br>
+Semimajor Axis: 6378137.0<br>
+Semiminor Axis: 6356752.314245179<br>
+Inverse Flattening: 298.257223563</p>
+</blockquote>
+<h4 id="WGS84-Web-Mercator的投影方法">WGS84 Web Mercator的投影方法</h4>
+<p>    从名字上可以看出，WGS84 Web Mercator坐标系的投影方法和Mercator（墨卡托）投影有关，但是这个投影方法和不是标准的墨卡托投影。他们之间的区别在于，WGS84 Web Mercator在投影时将地球椭球当做圆球看待，这会导致本来是等角投影的墨卡托投影变得不再等角了，而是近似等角，也就是出现角度变形。</p>
+<h4 id="WGS84-Web-Mercator的坐标范围">WGS84 Web Mercator的坐标范围</h4>
+<p>    以赤道为标准纬线，以本初子午线为中央经线，分别得到X轴和Y轴。两者的交点设为原点，规定纬度向北为正，向南为负；经度向东为正，向西为负。</p>
+<ul>
+<li>X轴：由于赤道半径为6378137米，则赤道周长为2πR = 2*20037508.3427892，因此X的取值范围是：[-20037508.3427892,20037508.3427892]。</li>
+<li>Y轴：由墨卡托投影的公式可知，当纬度φ接近两极，即90°时，y值趋向于无穷。因此规定Y的取值范围与X一致，也为[-20037508.3427892,20037508.3427892]，也就是形成了一个正方形。</li>
+</ul>
+<p>对应于经纬度的范围就是：</p>
+<ul>
+<li>经度： [-180, 180]</li>
+<li>纬度： [-85.051128779，85.051128779]</li>
+</ul>
+<h2 id="1-4-EPSG">1.4 EPSG</h2>
+<p>    讨论坐标系不得不提到EPSG，EPSG的英文全称是European Petroleum Survey Group，中文名称为欧洲石油调查组织。这个组织成立于1986年，2005年并入IOGP(International Association of Oil &amp; Gas Producers)，中文名称为国际油气生产者协会。EPSG对几乎所有常用的坐标系统都进行了编号，统一了坐标系的表示，于是我们经常会看到使用EPSG编号来指代某一坐标系。</p>
+<p>以下是几个常用坐标系的EPSG编号和单位：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">坐标系名</th>
+<th style="text-align:center">EPSG编号</th>
+<th style="text-align:center">单位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">WGS 84</td>
+<td style="text-align:center">EPSG:4326</td>
+<td style="text-align:center">度</td>
+</tr>
+<tr>
+<td style="text-align:center">WGS84 Web Mercator</td>
+<td style="text-align:center">EPSG:3857, EPSG:900913</td>
+<td style="text-align:center">米</td>
+</tr>
+</tbody>
+</table>
+<p>    至于为何WGS84 Web Mercator有两个编号，这里面还是有一段故事的，可以去<a target="_blank" rel="noopener" href="https://blog.csdn.net/kikitaMoon/article/details/46124935">这里</a>查看。</p>
+<p>    查询全部的EPSG编号和详细信息请访问<a target="_blank" rel="noopener" href="https://epsg.io/">EPSG官网</a>。</p>
+<h1>2 瓦片地图</h1>
+<p>    互联网地图服务，常常通过采用构建瓦片地图的方式，加快用户的访问，减少数据传输量。具体而言，瓦片地图就是对投影后的地图在不同尺度（层）下进行切片，每个尺度得到的地图切片数量不同、表示范围不同、详细程度不同，但是图片的尺寸相同（一般为256*256），最终构成一个“瓦片金字塔“”。根据用户所浏览的区域范围，自动确定所要返回的切片层级，在满足用户查询需求的同时，保证了地图传输的效率。<br>
+<img src="https://file.oattao.cn/202112151450773.jpeg" alt="瓦片金字塔.jpg"></p>
+<h2 id="2-1-瓦片地图的编号">2.1 瓦片地图的编号</h2>
+<p>    在投影坐标系的选择上，目前主流的地图服务提供商基本都选择的是WGS84 Web Mercator坐标系。但是在如何对投影后的地图进行切片并编号时，不同厂商之间存在较大的差异。</p>
+<h5 id="谷歌地图，OpenStreetMap，WMTS">谷歌地图，OpenStreetMap，WMTS</h5>
+<p>    以地图左上角为原点，X轴向右，Y轴向下，从0开始分别进行编号。Z的取值范围为[0, 18]，在第z级别，x,y方向的瓦片个数均为：2<sup>z</sup>个，即x,y取值范围是[0 , 2<sup>z</sup>-1]。</p>
+<p>    WMTS较为特殊，WMTS中的TileMatrix对应于z，TileRow对应于y，TileCol对应于x。编号方式和谷歌与OSM相同。</p>
+<h5 id="TMS">TMS</h5>
+<p>    以地图左下角为原点，X轴向右，Y轴向上，从0开始分别进行编号。Z的编码规则与谷歌地图相同。</p>
+<p>z=1时，这两种瓦片的编号如下图所示。<br>
+<img src="https://file.oattao.cn/202112151450579.jpeg" alt="谷歌和TMS地图切片 (z=1)"></p>
+<h5 id="Bing地图">Bing地图</h5>
+<p>    微软Bing地图Z的编码规则与谷歌相同，同一层级的瓦片不用XY两个维度表示，而只用一个整数表示，该整数服从四叉树编码规则（QuadTree）。</p>
+<p><img src="https://file.oattao.cn/202112151450249.jpeg" alt="Bing地图切片"></p>
+<h5 id="百度地图">百度地图</h5>
+<p>    百度地图的瓦片定义的方式比较独特，原点的位置在经纬度都为0的地方，X向左为正，向右为负；Y向上为正，向下为负。切分的方式不像上述3种方法在每一级进行二等分，而是通过定义每一级的<strong>地图分辨率</strong>，确定每一级应该划分的行列数。地图分辨率的表达式为：2<sup>18-z</sup>，其含义是每个像素所对应的实际长度。由此，可得每一级应该划分的行列数为：2πR/(256*2<sup>18-z</sup>)，其中R为地球的半径，单位是米。<br>
+<img src="https://file.oattao.cn/202112151450142.png" alt="百度地图切片"></p>
+<h2 id="2-2-瓦片编号与经纬度、投影坐标的转换">2.2 瓦片编号与经纬度、投影坐标的转换</h2>
+<p>参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/lxxlxx888/article/details/51897838">https://blog.csdn.net/lxxlxx888/article/details/51897838</a></p>
+<h1>总结</h1>
+<p>    本文记录了与WebGIS相关的坐标系和瓦片地图的知识，说明了他们直接的相互关系。希望WebGIS开发者有所帮助。</p>
+<h4 id="参考资料">参考资料</h4>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/liyan_gis/article/details/8021514">墨卡托及Web墨卡托投影</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/kikitaMoon/article/details/46124935">Web Mercator 公开的小秘密</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/fanwenyuan_fwy/article/details/77508894">OpenStreetMap/Google/百度/Bing瓦片地图服务(TMS)</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000011276788">瓦片地图原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%9C%B0%E7%90%86%E5%9D%90%E6%A0%87%E7%B3%BB/2272817?fr=aladdin">地理坐标系</a></li>
+<li><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%8A%95%E5%BD%B1%E5%9D%90%E6%A0%87%E7%B3%BB/3589518">投影坐标系</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.sina.com.cn/s/blog_6d6ddab20102wj68.html">有关几种常用的地理坐标系统与投影坐标系统的理解</a></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Yuto Zh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zyt4321.github.io/post/a349a0c1.html">https://zyt4321.github.io/post/a349a0c1.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zyt4321.github.io" target="_blank">於桃君的小仓库</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GIS/">GIS</a><a class="post-meta__tags" href="/tags/WebGIS/">WebGIS</a><a class="post-meta__tags" href="/tags/%E5%9D%90%E6%A0%87%E7%B3%BB/">坐标系</a><a class="post-meta__tags" href="/tags/%E7%93%A6%E7%89%87%E5%9C%B0%E5%9B%BE/">瓦片地图</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.47/img_474_1920x1080_96_null_normal.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/post/4a6c03a0.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/ushio-api-img-moe@5.0.33/img_333_2560x1440_72_null_normal.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">完全分布式HBase环境搭建【主要流程记录】</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">1 坐标系</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E5%9C%B0%E7%90%86%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 地理坐标系</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%8B%E8%BD%AC%E6%A4%AD%E7%90%83%E4%BD%93"><span class="toc-number">1.1.0.1.</span> <span class="toc-text">旋转椭球体</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%A7%E5%9C%B0%E5%9F%BA%E5%87%86%E9%9D%A2"><span class="toc-number">1.1.0.2.</span> <span class="toc-text">大地基准面</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%B0%E7%90%86%E5%9D%90%E6%A0%87"><span class="toc-number">1.1.0.3.</span> <span class="toc-text">地理坐标</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E6%8A%95%E5%BD%B1%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 投影坐标系</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%B0%E5%9B%BE%E6%8A%95%E5%BD%B1"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">地图投影</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E6%8A%95%E5%BD%B1%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.0.2.</span> <span class="toc-text">常用的投影方法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-WebGIS%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 WebGIS中常用的坐标系</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#WGS84-Web-Mercator%E7%9A%84%E5%9C%B0%E7%90%86%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="toc-number">1.3.0.1.</span> <span class="toc-text">WGS84 Web Mercator的地理坐标系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#WGS84-Web-Mercator%E7%9A%84%E6%8A%95%E5%BD%B1%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.0.2.</span> <span class="toc-text">WGS84 Web Mercator的投影方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#WGS84-Web-Mercator%E7%9A%84%E5%9D%90%E6%A0%87%E8%8C%83%E5%9B%B4"><span class="toc-number">1.3.0.3.</span> <span class="toc-text">WGS84 Web Mercator的坐标范围</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-EPSG"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 EPSG</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">2 瓦片地图</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E7%93%A6%E7%89%87%E5%9C%B0%E5%9B%BE%E7%9A%84%E7%BC%96%E5%8F%B7"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 瓦片地图的编号</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B0%B7%E6%AD%8C%E5%9C%B0%E5%9B%BE%EF%BC%8COpenStreetMap%EF%BC%8CWMTS"><span class="toc-number">2.1.0.0.1.</span> <span class="toc-text">谷歌地图，OpenStreetMap，WMTS</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#TMS"><span class="toc-number">2.1.0.0.2.</span> <span class="toc-text">TMS</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Bing%E5%9C%B0%E5%9B%BE"><span class="toc-number">2.1.0.0.3.</span> <span class="toc-text">Bing地图</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE"><span class="toc-number">2.1.0.0.4.</span> <span class="toc-text">百度地图</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E7%93%A6%E7%89%87%E7%BC%96%E5%8F%B7%E4%B8%8E%E7%BB%8F%E7%BA%AC%E5%BA%A6%E3%80%81%E6%8A%95%E5%BD%B1%E5%9D%90%E6%A0%87%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 瓦片编号与经纬度、投影坐标的转换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">3.0.0.1.</span> <span class="toc-text">参考资料</span></a></li></ol></li></ol></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2018 - 2021 By Yuto Zh</div><div class="footer_custom_text">赣ICP备15011558号</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.css"><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(()=>{
+  const $countDom = document.getElementById('twikoo-count')
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: ''
+    }, null))
+  }
+
+  const getCount = () => {
+    twikoo.getCommentsCount({
+      envId: 'https://twikoo-zyt654321-gmailcom.vercel.app/',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      $countDom.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const loadTwikoo = (bool = false) => {
+    if (typeof twikoo === 'object') {
+      init()
+      bool && $countDom && setTimeout(getCount,0)
+    } else {
+      getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(()=> {
+        init()
+        bool && $countDom && setTimeout(getCount,0)
+      })
+    }
+  }
+
+  if ('Twikoo' === 'Twikoo' || !true) {
+    if (true) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo(true)
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="/js/user_afterload.js"></script><script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script><link rel="stylesheet" href="/css"><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/about/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
+  window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
